@@ -1,6 +1,7 @@
 package com.zhao.lock;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.qw.soul.permission.SoulPermission;
@@ -19,14 +21,16 @@ import java.util.UUID;
 
 import cn.com.heaton.blelibrary.ble.Ble;
 import cn.com.heaton.blelibrary.ble.callback.BleConnectCallback;
-import cn.com.heaton.blelibrary.ble.callback.BleScanCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
 import cn.com.heaton.blelibrary.ble.model.BleDevice;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
     private LinearLayout mLockLy;
+    private TextView mLockTv;
+    private ProgressDialog progressDialog;
     private Ble<BleDevice> mBle;
+
+    private boolean lock = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initView() {
         mLockLy = findViewById(R.id.lock_ly);
         mLockLy.setOnClickListener(this);
+
+        mLockTv = findViewById(R.id.lock_tv);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCanceledOnTouchOutside(false);
     }
 
     private void initBle() {
@@ -84,49 +93,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableBtIntent, Ble.REQUEST_ENABLE_BT);
                 }
-                mBle.startScan(scanCallback);
+                if (lock) {
+                    progressDialog.setMessage("解锁中···");
+                } else {
+                    progressDialog.setMessage("锁定中···");
+                }
+                progressDialog.show();
+                mBle.connect("通过mac地址连接设备", connectCallback);
                 break;
             default:
                 break;
         }
     }
 
-    private BleScanCallback<BleDevice> scanCallback = new BleScanCallback<BleDevice>() {
-        @Override
-        public void onLeScan(final BleDevice device, int rssi, byte[] scanRecord) {
-            synchronized (mBle.getLocker()) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if ("这里是目标设备名称".equals(device.getBleName())) {
-                            mBle.connect(device, connectCallback);
-                        }
-                    }
-                });
-            }
-        }
-    };
-
     private BleConnectCallback<BleDevice> connectCallback = new BleConnectCallback<BleDevice>() {
         @Override
         public void onConnectionChanged(BleDevice device) {
             if (device.isConnected()) {
-                boolean result = mBle.write(device, "open".getBytes(), new BleWriteCallback<BleDevice>() {
-                    @Override
-                    public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                        Toast.makeText(MainActivity.this, "解锁成功", Toast.LENGTH_SHORT).show();
+                if (lock) {//解锁
+                    boolean result = mBle.write(device, "open".getBytes(), new BleWriteCallback<BleDevice>() {
+                        @Override
+                        public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                            lock = false;
+                            mLockTv.setText("锁定");
+                            Toast.makeText(MainActivity.this, "解锁成功", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    if (!result) {
+                        Toast.makeText(MainActivity.this, "解锁失败", Toast.LENGTH_SHORT).show();
                     }
-                });
-                if (!result) {
-                    Toast.makeText(MainActivity.this, "解锁失败", Toast.LENGTH_SHORT).show();
+                } else {//锁定
+                    boolean result = mBle.write(device, "close".getBytes(), new BleWriteCallback<BleDevice>() {
+                        @Override
+                        public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                            lock = true;
+                            mLockTv.setText("解锁");
+                            Toast.makeText(MainActivity.this, "锁定成功", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    if (!result) {
+                        Toast.makeText(MainActivity.this, "锁定失败", Toast.LENGTH_SHORT).show();
+                    }
                 }
+                progressDialog.dismiss();
             }
         }
 
         @Override
         public void onConnectException(BleDevice device, int errorCode) {
             super.onConnectException(device, errorCode);
-            Toast.makeText(MainActivity.this, "连接异常，异常状态码:" + errorCode + "请检查是否打开GPS", Toast.LENGTH_SHORT).show();
+            progressDialog.dismiss();
+            Toast.makeText(MainActivity.this, "连接异常，异常状态码:" + errorCode, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onConnectTimeOut(BleDevice device) {
+            super.onConnectTimeOut(device);
+            progressDialog.dismiss();
+            Toast.makeText(MainActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
         }
     };
 }
