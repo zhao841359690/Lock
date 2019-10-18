@@ -42,6 +42,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initBle();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mBle.destory(this);
+    }
+
     private void getPermission() {
         SoulPermission.getInstance().checkAndRequestPermissions(Permissions.build(Manifest.permission.ACCESS_COARSE_LOCATION)
                 , new CheckRequestPermissionsListener() {
