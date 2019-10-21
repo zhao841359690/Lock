@@ -1,11 +1,14 @@
 package com.zhao.lock;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -21,6 +24,7 @@ import java.util.UUID;
 
 import cn.com.heaton.blelibrary.ble.Ble;
 import cn.com.heaton.blelibrary.ble.callback.BleConnectCallback;
+import cn.com.heaton.blelibrary.ble.callback.BleScanCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
 import cn.com.heaton.blelibrary.ble.model.BleDevice;
 
@@ -31,6 +35,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Ble<BleDevice> mBle;
 
     private boolean lock = true;
+    private BleDevice bleDevice = null;
+
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            if (lock) {//解锁
+                boolean result = mBle.write(bleDevice, "open".getBytes(), new BleWriteCallback<BleDevice>() {
+                    @Override
+                    public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                        lock = false;
+                        mLockTv.setText("锁定");
+                        Toast.makeText(MainActivity.this, "解锁成功", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                if (!result) {
+                    Toast.makeText(MainActivity.this, "解锁失败", Toast.LENGTH_SHORT).show();
+                }
+            } else {//锁定
+                boolean result = mBle.write(bleDevice, "close".getBytes(), new BleWriteCallback<BleDevice>() {
+                    @Override
+                    public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                        lock = true;
+                        mLockTv.setText("解锁");
+                        Toast.makeText(MainActivity.this, "锁定成功", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                if (!result) {
+                    Toast.makeText(MainActivity.this, "锁定失败", Toast.LENGTH_SHORT).show();
+                }
+            }
+            progressDialog.dismiss();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +116,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setConnectFailedRetryCount(3)
                 .setConnectTimeout(10 * 1000)//设置连接超时时长（默认10*1000 ms）
                 .setScanPeriod(12 * 1000)//设置扫描时长（默认10*1000 ms）
-                .setUuidService(UUID.fromString("0000fee9-0000-1000-8000-00805f9b34fb"))//主服务的uuid
-                .setUuidWriteCha(UUID.fromString("d44bc439-abfd-45a2-b575-925416129600"))//可写特征的uuid
+                .setUuidService(UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e"))//主服务的uuid
+                .setUuidWriteCha(UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e"))//可写特征的uuid
                 .create(getApplicationContext());
     }
 
@@ -99,7 +139,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     progressDialog.setMessage("锁定中···");
                 }
                 progressDialog.show();
-                mBle.connect("通过mac地址连接设备", connectCallback);
+
+                if (bleDevice != null && bleDevice.isConnected()) {
+                    handler.sendEmptyMessageDelayed(1, 2000);
+                } else {
+                    mBle.startScan(new BleScanCallback<BleDevice>() {
+                        @Override
+                        public void onLeScan(BleDevice device, int rssi, byte[] scanRecord) {
+                            if (scanRecord != null && scanRecord.length >= 7) {
+                                if (scanRecord[4] == -1 && scanRecord[5] == 89 && scanRecord[6] == 0) {
+                                    mBle.stopScan();
+                                    mBle.connect(device, connectCallback);
+                                }
+                            }
+                        }
+                    });
+                }
                 break;
             default:
                 break;
@@ -110,32 +165,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public void onConnectionChanged(BleDevice device) {
             if (device.isConnected()) {
-                if (lock) {//解锁
-                    boolean result = mBle.write(device, "open".getBytes(), new BleWriteCallback<BleDevice>() {
-                        @Override
-                        public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                            lock = false;
-                            mLockTv.setText("锁定");
-                            Toast.makeText(MainActivity.this, "解锁成功", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    if (!result) {
-                        Toast.makeText(MainActivity.this, "解锁失败", Toast.LENGTH_SHORT).show();
-                    }
-                } else {//锁定
-                    boolean result = mBle.write(device, "close".getBytes(), new BleWriteCallback<BleDevice>() {
-                        @Override
-                        public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                            lock = true;
-                            mLockTv.setText("解锁");
-                            Toast.makeText(MainActivity.this, "锁定成功", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    if (!result) {
-                        Toast.makeText(MainActivity.this, "锁定失败", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                progressDialog.dismiss();
+                bleDevice = device;
+                handler.sendEmptyMessageDelayed(1, 2000);
             }
         }
 
