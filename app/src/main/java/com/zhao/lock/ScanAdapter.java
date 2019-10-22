@@ -35,6 +35,8 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ViewHolder> {
         void onOpenClick(BleDevice bleDevice);
 
         void onCloseClick(BleDevice bleDevice);
+
+        void onDisconnectClick(BleDevice bleDevice);
     }
 
     @NonNull
@@ -60,6 +62,12 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ViewHolder> {
                 onItemClickListener.onCloseClick(bleDevice);
             }
         });
+        viewHolder.disconnectTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClickListener.onDisconnectClick(bleDevice);
+            }
+        });
     }
 
     @Override
@@ -71,12 +79,14 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ViewHolder> {
         TextView deviceNameTv;
         TextView openTv;
         TextView closeTv;
+        TextView disconnectTv;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             deviceNameTv = itemView.findViewById(R.id.device_name_tv);
             openTv = itemView.findViewById(R.id.open_tv);
             closeTv = itemView.findViewById(R.id.close_tv);
+            disconnectTv = itemView.findViewById(R.id.disconnect_tv);
         }
     }
 }

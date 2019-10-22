@@ -192,6 +192,14 @@ public class MainActivity extends AppCompatActivity {
                     mBle.connect(bleDevice, connectCallback);
                 }
             }
+
+            @Override
+            public void onDisconnectClick(BleDevice bleDevice) {
+                if (mBleDevice.isConnected()) {
+                    mBle.disconnect(bleDevice);
+                    Toast.makeText(MainActivity.this, "断开连接", Toast.LENGTH_SHORT).show();
+                }
+            }
         });
     }
 
