@@ -1,5 +1,6 @@
 package com.zhao.lock;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -46,10 +47,12 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ViewHolder> {
         return new ViewHolder(view);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
         final BleDevice bleDevice = dataList.get(position);
         viewHolder.deviceNameTv.setText(bleDevice.getBleName());
+        viewHolder.deviceAddressTv.setText("Mac:" + bleDevice.getBleAddress());
         viewHolder.openTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,6 +80,7 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ViewHolder> {
 
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView deviceNameTv;
+        TextView deviceAddressTv;
         TextView openTv;
         TextView closeTv;
         TextView disconnectTv;
@@ -84,6 +88,7 @@ public class ScanAdapter extends RecyclerView.Adapter<ScanAdapter.ViewHolder> {
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             deviceNameTv = itemView.findViewById(R.id.device_name_tv);
+            deviceAddressTv = itemView.findViewById(R.id.device_address_tv);
             openTv = itemView.findViewById(R.id.open_tv);
             closeTv = itemView.findViewById(R.id.close_tv);
             disconnectTv = itemView.findViewById(R.id.disconnect_tv);

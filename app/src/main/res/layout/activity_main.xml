@@ -6,6 +6,29 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <View
+        android:id="@+id/status_bar_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#0395FA" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#0395FA"
+        android:gravity="center"
+        android:padding="10dp"
+        android:text="钥匙"
+        android:textColor="#ffffff"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/scan_rv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
     <TextView
         android:id="@+id/scan_tv"
         android:layout_width="match_parent"
@@ -14,13 +37,9 @@
         android:background="@drawable/bg_scan"
         android:gravity="center"
         android:padding="10dp"
-        android:text="点击扫描" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/scan_rv"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:text="扫描"
+        android:textColor="#ffffff"
+        android:textSize="19sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -45,7 +64,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
-                android:text="首页" />
+                android:text="首页"
+                android:textColor="#333333"
+                android:textSize="11sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -65,7 +86,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
                 android:text="钥匙"
-                android:textColor="#3096FA" />
+                android:textColor="#333333"
+                android:textSize="11sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -84,7 +106,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
-                android:text="日志" />
+                android:text="日志"
+                android:textColor="#333333"
+                android:textSize="11sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -103,7 +127,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="3dp"
-                android:text="位置" />
+                android:text="位置"
+                android:textColor="#333333"
+                android:textSize="11sp" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
