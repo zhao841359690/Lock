@@ -7,41 +7,20 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/scan_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/bg_scan"
+        android:gravity="center"
         android:padding="10dp"
-        android:text="请选择扫码方式" />
+        android:text="点击扫描" />
 
-    <RelativeLayout
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/scan_rv"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="#79B4D4">
-
-        <LinearLayout
-            android:id="@+id/lock_ly"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@mipmap/ic_launcher" />
-
-            <TextView
-                android:id="@+id/lock_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginTop="10dp"
-                android:text="解锁"
-                android:textColor="#fff" />
-        </LinearLayout>
-
-    </RelativeLayout>
+        android:layout_weight="1" />
 
     <LinearLayout
         android:layout_width="match_parent"
