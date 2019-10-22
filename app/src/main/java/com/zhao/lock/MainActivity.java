@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (!mBle.isBleEnable()) {
                     Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                     startActivityForResult(enableBtIntent, Ble.REQUEST_ENABLE_BT);
+                    return;
                 }
                 if (lock) {
                     progressDialog.setMessage("解锁中···");
