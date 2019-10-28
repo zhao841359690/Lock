@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,7 +34,16 @@ import cn.com.heaton.blelibrary.ble.callback.BleScanCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
 import cn.com.heaton.blelibrary.ble.model.BleDevice;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private ImageView mOtherIv;
+    private LinearLayout mHomeLy;
+    private ImageView mHomeIv;
+    private LinearLayout mKeyLy;
+    private ImageView mKeyIv;
+    private LinearLayout mLogLy;
+    private ImageView mLogIv;
+    private LinearLayout mPositionLy;
+    private ImageView mPositionIv;
     private TextView mScanTv;
     private RecyclerView mScanRv;
     private ScanAdapter mAdapter;
@@ -113,6 +124,23 @@ public class MainActivity extends AppCompatActivity {
     private void initView() {
         progressDialog = new ProgressDialog(this);
         progressDialog.setCanceledOnTouchOutside(false);
+
+        mOtherIv = findViewById(R.id.other_iv);
+        mHomeLy = findViewById(R.id.home_ly);
+        mHomeLy.setOnClickListener(this);
+        mHomeIv = findViewById(R.id.home_iv);
+
+        mKeyLy = findViewById(R.id.key_ly);
+        mKeyLy.setOnClickListener(this);
+        mKeyIv = findViewById(R.id.key_iv);
+
+        mLogLy = findViewById(R.id.log_ly);
+        mLogLy.setOnClickListener(this);
+        mLogIv = findViewById(R.id.log_iv);
+
+        mPositionLy = findViewById(R.id.position_ly);
+        mPositionLy.setOnClickListener(this);
+        mPositionIv = findViewById(R.id.position_iv);
 
         mScanTv = findViewById(R.id.scan_tv);
         mScanTv.setOnClickListener(new View.OnClickListener() {
@@ -244,4 +272,44 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
         }
     };
+
+    @Override
+    public void onClick(View v) {
+        mHomeIv.setImageResource(R.drawable.home_normal);
+        mKeyIv.setImageResource(R.drawable.key_normal);
+        mLogIv.setImageResource(R.drawable.log_normal);
+        mPositionIv.setImageResource(R.drawable.position_normal);
+        switch (v.getId()) {
+            case R.id.home_ly:
+                mHomeIv.setImageResource(R.drawable.home_active);
+
+                mOtherIv.setImageResource(R.drawable.home);
+
+                mOtherIv.setVisibility(View.VISIBLE);
+                mScanRv.setVisibility(View.GONE);
+                mScanTv.setVisibility(View.GONE);
+                break;
+            case R.id.key_ly:
+                mKeyIv.setImageResource(R.drawable.key_active);
+                break;
+            case R.id.log_ly:
+                mLogIv.setImageResource(R.drawable.log_active);
+
+                mOtherIv.setVisibility(View.GONE);
+                mScanRv.setVisibility(View.VISIBLE);
+                mScanTv.setVisibility(View.VISIBLE);
+                break;
+            case R.id.position_ly:
+                mPositionIv.setImageResource(R.drawable.position_active);
+
+                mOtherIv.setImageResource(R.drawable.position);
+
+                mOtherIv.setVisibility(View.VISIBLE);
+                mScanRv.setVisibility(View.GONE);
+                mScanTv.setVisibility(View.GONE);
+                break;
+            default:
+                break;
+        }
+    }
 }
