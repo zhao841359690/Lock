@@ -35,6 +35,7 @@ import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
 import cn.com.heaton.blelibrary.ble.model.BleDevice;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private TextView mTitleTv;
     private ImageView mOtherIv;
     private LinearLayout mHomeLy;
     private ImageView mHomeIv;
@@ -124,6 +125,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initView() {
         progressDialog = new ProgressDialog(this);
         progressDialog.setCanceledOnTouchOutside(false);
+
+        mTitleTv=findViewById(R.id.title_tv);
 
         mOtherIv = findViewById(R.id.other_iv);
         mHomeLy = findViewById(R.id.home_ly);
@@ -283,6 +286,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.home_ly:
                 mHomeIv.setImageResource(R.drawable.home_active);
 
+                mTitleTv.setText("首页");
                 mOtherIv.setImageResource(R.drawable.home);
 
                 mOtherIv.setVisibility(View.VISIBLE);
@@ -291,17 +295,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.key_ly:
                 mKeyIv.setImageResource(R.drawable.key_active);
-                break;
-            case R.id.log_ly:
-                mLogIv.setImageResource(R.drawable.log_active);
 
+                mTitleTv.setText("钥匙");
                 mOtherIv.setVisibility(View.GONE);
                 mScanRv.setVisibility(View.VISIBLE);
                 mScanTv.setVisibility(View.VISIBLE);
                 break;
+            case R.id.log_ly:
+                mLogIv.setImageResource(R.drawable.log_active);
+
+                mTitleTv.setText("日志");
+                mOtherIv.setImageResource(R.drawable.log);
+
+                mOtherIv.setVisibility(View.VISIBLE);
+                mScanRv.setVisibility(View.GONE);
+                mScanTv.setVisibility(View.GONE);
+                break;
             case R.id.position_ly:
                 mPositionIv.setImageResource(R.drawable.position_active);
 
+                mTitleTv.setText("位置");
                 mOtherIv.setImageResource(R.drawable.position);
 
                 mOtherIv.setVisibility(View.VISIBLE);

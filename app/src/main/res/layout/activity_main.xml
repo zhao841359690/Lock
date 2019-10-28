@@ -13,12 +13,13 @@
         android:background="#0395FA" />
 
     <TextView
+        android:id="@+id/title_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#0395FA"
         android:gravity="center"
         android:padding="10dp"
-        android:text="钥匙"
+        android:text="首页"
         android:textColor="#ffffff"
         android:textSize="16sp"
         android:textStyle="bold" />
