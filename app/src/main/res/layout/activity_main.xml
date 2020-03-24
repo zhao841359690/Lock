@@ -4,65 +4,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".ui.activity.MainActivity">
+
+    <include layout="@layout/toolbar" />
+
+    <FrameLayout
+        android:id="@+id/fragment_group"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <View
-        android:id="@+id/status_bar_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="#0395FA" />
-
-    <TextView
-        android:id="@+id/title_tv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#0395FA"
-        android:gravity="center"
-        android:padding="10dp"
-        android:text="首页"
-        android:textColor="#ffffff"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-    <ImageView
-        android:id="@+id/other_iv"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:scaleType="fitXY"
-        android:src="@drawable/home" />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/scan_rv"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/scan_tv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="10dp"
-        android:background="@drawable/bg_scan"
-        android:gravity="center"
-        android:padding="10dp"
-        android:text="扫描"
-        android:textColor="#ffffff"
-        android:textSize="19sp"
-        android:visibility="gone" />
+        android:layout_height="1dp"
+        android:background="@color/gray" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        android:padding="5dp">
 
         <LinearLayout
-            android:id="@+id/home_ly"
+            android:id="@+id/home_page_ly"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -70,22 +34,20 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/home_iv"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/home_active" />
-
-            <TextView
+                android:id="@+id/home_page_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="首页"
-                android:textColor="#333333"
-                android:textSize="11sp" />
+                android:src="@mipmap/ic_launcher" />
+
+            <TextView
+                android:id="@+id/home_page_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="首页" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/key_ly"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -93,22 +55,18 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/key_iv"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/key_normal" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_launcher" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="钥匙"
-                android:textColor="#333333"
-                android:textSize="11sp" />
+                android:layout_marginTop="5dp" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/log_ly"
+            android:id="@+id/mine_ly"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -116,41 +74,17 @@
             android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/log_iv"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/log_normal" />
-
-            <TextView
+                android:id="@+id/mine_iv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="日志"
-                android:textColor="#333333"
-                android:textSize="11sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/position_ly"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <ImageView
-                android:id="@+id/position_iv"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/position_normal" />
+                android:src="@mipmap/ic_launcher" />
 
             <TextView
+                android:id="@+id/mine_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:text="位置"
-                android:textColor="#333333"
-                android:textSize="11sp" />
+                android:layout_marginTop="5dp"
+                android:text="我的" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

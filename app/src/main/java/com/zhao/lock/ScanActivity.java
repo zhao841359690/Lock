@@ -34,7 +34,7 @@ import cn.com.heaton.blelibrary.ble.callback.BleScanCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
 import cn.com.heaton.blelibrary.ble.model.BleDevice;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class ScanActivity extends AppCompatActivity implements View.OnClickListener {
     private TextView mTitleTv;
     private ImageView mOtherIv;
     private LinearLayout mHomeLy;
@@ -66,21 +66,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 boolean result = mBle.write(mBleDevice, "open".getBytes(), new BleWriteCallback<BleDevice>() {
                     @Override
                     public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                        Toast.makeText(MainActivity.this, "解锁成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ScanActivity.this, "解锁成功", Toast.LENGTH_SHORT).show();
                     }
                 });
                 if (!result) {
-                    Toast.makeText(MainActivity.this, "解锁失败", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ScanActivity.this, "解锁失败", Toast.LENGTH_SHORT).show();
                 }
             } else {//锁定
                 boolean result = mBle.write(mBleDevice, "close".getBytes(), new BleWriteCallback<BleDevice>() {
                     @Override
                     public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                        Toast.makeText(MainActivity.this, "锁定成功", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ScanActivity.this, "锁定成功", Toast.LENGTH_SHORT).show();
                     }
                 });
                 if (!result) {
-                    Toast.makeText(MainActivity.this, "锁定失败", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ScanActivity.this, "锁定失败", Toast.LENGTH_SHORT).show();
                 }
             }
             progressDialog.dismiss();
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_scan);
         ImmersionBar.with(this)
                 .statusBarView(findViewById(R.id.status_bar_view))
                 .keyboardEnable(true)
@@ -149,8 +149,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mScanTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mBle.isSupportBle(MainActivity.this)) {
-                    Toast.makeText(MainActivity.this, "BLE is not supported", Toast.LENGTH_SHORT).show();
+                if (!mBle.isSupportBle(ScanActivity.this)) {
+                    Toast.makeText(ScanActivity.this, "BLE is not supported", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (!mBle.isBleEnable()) {
@@ -233,7 +233,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onDisconnectClick(BleDevice bleDevice) {
                 if (mBleDevice.isConnected()) {
                     mBle.disconnect(bleDevice);
-                    Toast.makeText(MainActivity.this, "断开连接", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ScanActivity.this, "断开连接", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -265,14 +265,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void onConnectException(BleDevice device, int errorCode) {
             super.onConnectException(device, errorCode);
             progressDialog.dismiss();
-            Toast.makeText(MainActivity.this, "连接异常，异常状态码:" + errorCode, Toast.LENGTH_SHORT).show();
+            Toast.makeText(ScanActivity.this, "连接异常，异常状态码:" + errorCode, Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onConnectTimeOut(BleDevice device) {
             super.onConnectTimeOut(device);
             progressDialog.dismiss();
-            Toast.makeText(MainActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ScanActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -287,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mHomeIv.setImageResource(R.drawable.home_active);
 
                 mTitleTv.setText("首页");
-                mOtherIv.setImageResource(R.drawable.home);
+                mOtherIv.setImageResource(R.drawable.about);
 
                 mOtherIv.setVisibility(View.VISIBLE);
                 mScanRv.setVisibility(View.GONE);
