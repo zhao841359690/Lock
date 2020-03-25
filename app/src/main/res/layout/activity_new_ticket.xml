@@ -8,14 +8,9 @@
 
     <include layout="@layout/toolbar" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/gray" />
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:gravity="center">
 
         <EditText
@@ -24,7 +19,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@null"
-            android:hint="请输入钱箱编号" />
+            android:hint="请输入钱箱编号"
+            android:textColor="#AFAFAF"
+            android:textSize="16sp" />
 
         <ImageView
             android:id="@+id/cash_drawer_number_iv"
@@ -40,7 +37,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:gravity="center">
 
         <EditText
@@ -49,7 +46,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@null"
-            android:hint="请输入锁体编号" />
+            android:hint="请输入锁体编号"
+            android:textColor="#AFAFAF"
+            android:textSize="16sp" />
 
         <ImageView
             android:id="@+id/lock_body_number_iv"
@@ -66,14 +65,16 @@
     <LinearLayout
         android:id="@+id/time_ly"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:gravity="center">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="请选择操作时间" />
+            android:text="请选择操作时间"
+            android:textColor="#AFAFAF"
+            android:textSize="16sp" />
 
         <ImageView
             android:layout_width="wrap_content"
@@ -89,14 +90,16 @@
     <LinearLayout
         android:id="@+id/type_ly"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:gravity="center">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="请选择任务类型" />
+            android:text="请选择任务类型"
+            android:textColor="#AFAFAF"
+            android:textSize="16sp" />
 
         <ImageView
             android:layout_width="wrap_content"

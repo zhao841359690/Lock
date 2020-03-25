@@ -11,7 +11,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="@color/black" />
+            android:background="@drawable/head_portrait_img_bj" />
 
         <ImageView
             android:id="@+id/head_iv"
@@ -26,18 +26,23 @@
         android:id="@+id/name_tv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:gravity="center"
         android:text="我的姓名"
+        android:textColor="@color/text_black"
+        android:textSize="21sp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/my_ticket_tv"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_marginTop="20dp"
-        android:padding="10dp"
-        android:text="我的工单" />
+        android:gravity="center_vertical"
+        android:paddingStart="15dp"
+        android:text="我的工单"
+        android:textColor="@color/text_black"
+        android:textSize="16sp" />
 
     <View
         android:layout_width="match_parent"
@@ -47,26 +52,37 @@
     <RelativeLayout
         android:id="@+id/about_rl"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="10dp">
+        android:layout_height="40dp"
+        android:gravity="center_vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="关于软件" />
+            android:layout_marginStart="15dp"
+            android:text="关于软件"
+            android:textColor="@color/text_black"
+            android:textSize="16sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:text="版本 0.0.1" />
+            android:layout_marginEnd="15dp"
+            android:text="版本 0.0.1"
+            android:textColor="#999999"
+            android:textSize="16sp" />
     </RelativeLayout>
 
-    <Button
-        android:id="@+id/sign_out_btn"
+    <TextView
+        android:id="@+id/sign_out_tv"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/shape_white"
         android:gravity="center"
-        android:text="退出登录" />
+        android:text="退出登录"
+        android:textColor="#ff5454"
+        android:textSize="13sp" />
 </LinearLayout>

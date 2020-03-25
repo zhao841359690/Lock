@@ -1,23 +1,25 @@
 package com.zhao.lock.ui.activity;
 
-import android.os.Bundle;
 import android.text.Html;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.bumptech.glide.request.RequestOptions;
 import com.zhao.lock.R;
-import com.zhao.lock.app.BaseApp;
 import com.zhao.lock.base.BaseActivity;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 public class LockActivity extends BaseActivity {
-    @BindView(R.id.title_tv)
-    TextView titleTv;
+    @BindView(R.id.title_left_rl)
+    RelativeLayout titleLeftRl;
+    @BindView(R.id.title_left_iv)
+    ImageView titleLeftIv;
+    @BindView(R.id.title_line_View)
+    View titleLineView;
     @BindView(R.id.pending_tv)
     TextView pendingTv;
     @BindView(R.id.ticket_number_tv)
@@ -43,15 +45,25 @@ public class LockActivity extends BaseActivity {
 
     @Override
     protected void initView() {
-        pendingTv.setText(Html.fromHtml("您有一条<font color='#FF0000'>[待操作]</font>的订单"));
-        ticketNumberTv.setText("工单编号:ABC800214");
-        lockBodyNumberTv.setText("锁体编号:NB885607");
-        cabinetNumber.setText("箱体编号:AB123545");
-        timeTv.setText("2020.03.02 16:00 - 2020.03.02 17:30 ");
-        typeTv.setText(Html.fromHtml("操作类型:<font color='#FF0000'>开锁 - 关锁</font>"));
+        titleLeftIv.setVisibility(View.VISIBLE);
+        titleLineView.setVisibility(View.GONE);
 
-        Glide.with(BaseApp.getContext()).load(R.mipmap.ic_launcher)
-                .apply(RequestOptions.bitmapTransform(new CircleCrop()))
-                .into(lockIv);
+        pendingTv.setText(Html.fromHtml("您有一条<font color='#0E5EAB'>[待操作]</font>的订单"));
+        ticketNumberTv.setText("工单编号：ABC800214");
+        lockBodyNumberTv.setText("锁体编号：NB885607");
+        cabinetNumber.setText("箱体编号：AB123545");
+        timeTv.setText("2020.03.02 16:00 - 2020.03.02 17:30 ");
+        typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>开锁 - 关锁</font>"));
+    }
+
+    @OnClick({R.id.title_left_rl, R.id.lock_ly})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.title_left_rl:
+                finish();
+                break;
+            case R.id.lock_ly:
+                break;
+        }
     }
 }

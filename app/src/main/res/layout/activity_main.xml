@@ -36,7 +36,7 @@
                 android:id="@+id/home_page_iv"
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/home_normal" />
 
             <TextView
                 android:id="@+id/home_page_tv"
@@ -60,7 +60,7 @@
                 android:id="@+id/new_ticket_iv"
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/add_order_icon" />
 
             <TextView
                 android:id="@+id/new_ticket_tv"
@@ -84,7 +84,7 @@
                 android:id="@+id/mine_iv"
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:src="@mipmap/ic_launcher" />
+                android:src="@drawable/me_normal_icon" />
 
             <TextView
                 android:id="@+id/mine_tv"

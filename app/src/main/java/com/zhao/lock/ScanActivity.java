@@ -96,8 +96,6 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
                 .keyboardEnable(true)
                 .init();
 
-        getPermission();
-        initBle();
         initView();
     }
 
@@ -107,26 +105,11 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
         mBle.destory(this);
     }
 
-    private void getPermission() {
-        SoulPermission.getInstance().checkAndRequestPermissions(Permissions.build(Manifest.permission.ACCESS_COARSE_LOCATION)
-                , new CheckRequestPermissionsListener() {
-                    @Override
-                    public void onAllPermissionOk(Permission[] allPermissions) {
-
-                    }
-
-                    @Override
-                    public void onPermissionDenied(Permission[] refusedPermissions) {
-
-                    }
-                });
-    }
-
     private void initView() {
         progressDialog = new ProgressDialog(this);
         progressDialog.setCanceledOnTouchOutside(false);
 
-        mTitleTv=findViewById(R.id.title_tv);
+        mTitleTv = findViewById(R.id.title_tv);
 
         mOtherIv = findViewById(R.id.other_iv);
         mHomeLy = findViewById(R.id.home_ly);
@@ -149,45 +132,7 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
         mScanTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mBle.isSupportBle(ScanActivity.this)) {
-                    Toast.makeText(ScanActivity.this, "BLE is not supported", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (!mBle.isBleEnable()) {
-                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    startActivityForResult(enableBtIntent, Ble.REQUEST_ENABLE_BT);
-                    return;
-                }
 
-                mBle.startScan(new BleScanCallback<BleDevice>() {
-                    @Override
-                    public void onStart() {
-                        super.onStart();
-                        progressDialog.setMessage("扫描中···");
-                        progressDialog.show();
-                    }
-
-                    @Override
-                    public void onLeScan(BleDevice device, int rssi, byte[] scanRecord) {
-                        if (scanRecord != null && scanRecord.length >= 7) {
-                            if (scanRecord[4] == -1 && scanRecord[5] == 89 && scanRecord[6] == 0) {
-                                for (BleDevice d : bleDeviceList) {
-                                    if (d.getBleAddress().equals(device.getBleAddress())) {
-                                        return;
-                                    }
-                                }
-                                bleDeviceList.add(device);
-                                mAdapter.setDataList(bleDeviceList);
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onStop() {
-                        super.onStop();
-                        progressDialog.dismiss();
-                    }
-                });
             }
         });
 
@@ -238,21 +183,6 @@ public class ScanActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
-
-    private void initBle() {
-        mBle = Ble.options()//开启配置
-                .setLogBleExceptions(true)//设置是否输出打印蓝牙日志（非正式打包请设置为true，以便于调试）
-                .setThrowBleException(true)//设置是否抛出蓝牙异常
-                .setAutoConnect(true)//设置是否自动连接
-                .setFilterScan(true)//设置是否过滤扫描到的设备
-                .setConnectFailedRetryCount(3)
-                .setConnectTimeout(10 * 1000)//设置连接超时时长（默认10*1000 ms）
-                .setScanPeriod(12 * 1000)//设置扫描时长（默认10*1000 ms）
-                .setUuidService(UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e"))//主服务的uuid
-                .setUuidWriteCha(UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e"))//可写特征的uuid
-                .create(getApplicationContext());
-    }
-
     private BleConnectCallback<BleDevice> connectCallback = new BleConnectCallback<BleDevice>() {
         @Override
         public void onConnectionChanged(BleDevice device) {

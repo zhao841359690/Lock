@@ -1,7 +1,9 @@
 package com.zhao.lock.ui.activity;
 
 
+import android.Manifest;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -9,10 +11,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.qw.soul.permission.SoulPermission;
+import com.qw.soul.permission.bean.Permission;
+import com.qw.soul.permission.bean.Permissions;
+import com.qw.soul.permission.callbcak.CheckRequestPermissionsListener;
 import com.zhao.lock.R;
 import com.zhao.lock.base.BaseActivity;
 import com.zhao.lock.core.constant.Constants;
 import com.zhao.lock.ui.fragment.AboutFragment;
+import com.zhao.lock.ui.fragment.BleScanFragment;
 import com.zhao.lock.ui.fragment.HomePageFragment;
 import com.zhao.lock.ui.fragment.MineFragment;
 import com.zhao.lock.ui.fragment.MyTicketFragment;
@@ -20,7 +27,7 @@ import com.zhao.lock.ui.fragment.MyTicketFragment;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class MainActivity extends BaseActivity implements HomePageFragment.OnHomePageFragmentClickListener, MineFragment.OnMineFragmentClickListener {
+public class MainActivity extends BaseActivity implements HomePageFragment.OnHomePageFragmentClickListener, MineFragment.OnMineFragmentClickListener, BleScanFragment.OnBleScanFragmentClickListener {
 
     @BindView(R.id.toolbar)
     LinearLayout toolBar;
@@ -51,6 +58,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
     private MineFragment mineFragment;
     private AboutFragment aboutFragment;
     private MyTicketFragment myTicketFragment;
+    private BleScanFragment bleScanFragment;
 
     private int mLastFgIndex = -1;
 
@@ -61,6 +69,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
 
     @Override
     protected void initView() {
+        getPermission();
         showFragment(Constants.TYPE_HOME_PAGE);
     }
 
@@ -72,11 +81,19 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
                 break;
             case R.id.new_ticket_ly:
                 Intent intent = new Intent(this, NewTicketActivity.class);
-                startActivityForResult(intent, 1);
+                startActivityForResult(intent, Constants.NEW_TICKET);
                 break;
             case R.id.mine_ly:
                 showFragment(Constants.TYPE_MINE);
                 break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == Constants.NEW_TICKET && resultCode == Constants.NEW_TICKET) {
+            showFragment(Constants.TYPE_MY_TICKET);
         }
     }
 
@@ -87,7 +104,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
 
     @Override
     public void onBleScanClick() {
-
+        showFragment(Constants.TYPE_BLE_SCAN);
     }
 
     @Override
@@ -110,6 +127,11 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
         finish();
     }
 
+    @Override
+    public void onAccessClick() {
+        showFragment(Constants.TYPE_MY_TICKET);
+    }
+
     private void showFragment(int index) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         hideFragment(transaction);
@@ -119,6 +141,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
                 toolBar.setVisibility(View.VISIBLE);
                 titleTv.setVisibility(View.VISIBLE);
                 titleTv.setText("首页");
+                homePageIv.setImageResource(R.drawable.home_active);
                 if (homePageFragment == null) {
                     homePageFragment = HomePageFragment.newInstance();
                     transaction.add(R.id.fragment_group, homePageFragment);
@@ -128,6 +151,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
                 break;
             case Constants.TYPE_MINE:
                 toolBar.setVisibility(View.GONE);
+                mineIv.setImageResource(R.drawable.me_pitch_icon);
                 if (mineFragment == null) {
                     mineFragment = MineFragment.newInstance();
                     transaction.add(R.id.fragment_group, mineFragment);
@@ -143,6 +167,16 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
                     transaction.add(R.id.fragment_group, aboutFragment);
                 }
                 transaction.show(aboutFragment);
+                break;
+            case Constants.TYPE_BLE_SCAN:
+                toolBar.setVisibility(View.VISIBLE);
+                titleTv.setText("BLE扫描-结果");
+                if (bleScanFragment == null) {
+                    bleScanFragment = BleScanFragment.newInstance();
+                    transaction.add(R.id.fragment_group, bleScanFragment);
+                }
+                bleScanFragment.setOnBleScanFragmentClickListener(this);
+                transaction.show(bleScanFragment);
                 break;
             case Constants.TYPE_MY_TICKET:
                 toolBar.setVisibility(View.VISIBLE);
@@ -160,6 +194,9 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
     }
 
     private void hideFragment(FragmentTransaction transaction) {
+        homePageIv.setImageResource(R.drawable.home_normal);
+        mineIv.setImageResource(R.drawable.me_normal_icon);
+
         switch (mLastFgIndex) {
             case Constants.TYPE_HOME_PAGE:
                 if (homePageFragment != null) {
@@ -176,6 +213,11 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
                     transaction.hide(aboutFragment);
                 }
                 break;
+            case Constants.TYPE_BLE_SCAN:
+                if (bleScanFragment != null) {
+                    transaction.hide(bleScanFragment);
+                }
+                break;
             case Constants.TYPE_MY_TICKET:
                 if (myTicketFragment != null) {
                     transaction.hide(myTicketFragment);
@@ -184,5 +226,20 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
             default:
                 break;
         }
+    }
+
+    private void getPermission() {
+        SoulPermission.getInstance().checkAndRequestPermissions(Permissions.build(Manifest.permission.ACCESS_COARSE_LOCATION)
+                , new CheckRequestPermissionsListener() {
+                    @Override
+                    public void onAllPermissionOk(Permission[] allPermissions) {
+
+                    }
+
+                    @Override
+                    public void onPermissionDenied(Permission[] refusedPermissions) {
+
+                    }
+                });
     }
 }

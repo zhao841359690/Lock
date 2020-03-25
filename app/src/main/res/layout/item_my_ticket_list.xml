@@ -15,7 +15,7 @@
         <ImageView
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:src="@mipmap/ic_launcher" />
+            android:src="@drawable/order_normal_icon" />
 
         <TextView
             android:id="@+id/ticket_number_tv"
@@ -31,7 +31,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
-            android:text="待操作" />
+            android:text="待操作"
+            android:visibility="invisible" />
     </LinearLayout>
 
     <LinearLayout

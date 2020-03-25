@@ -9,4 +9,7 @@ public class Constants {
     public static final int TYPE_MINE = 1;
     public static final int TYPE_ABOUT = 2;
     public static final int TYPE_MY_TICKET = 3;
+    public static final int TYPE_BLE_SCAN = 4;
+
+    public static final int NEW_TICKET = 1;
 }

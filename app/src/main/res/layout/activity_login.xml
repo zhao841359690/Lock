@@ -17,11 +17,11 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="250dp">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_centerInParent="true"
             android:src="@mipmap/ic_launcher" />
 
@@ -30,23 +30,24 @@
     <EditText
         android:id="@+id/phoneNumber_et"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:layout_height="45dp"
         android:background="@drawable/shape_gray_corner"
-        android:drawableStart="@mipmap/ic_launcher"
+        android:drawableStart="@drawable/phone_id_icon"
         android:drawablePadding="10dp"
         android:hint="手机号"
         android:inputType="phone"
-        android:padding="5dp" />
+        android:padding="10dp"
+        android:textColor="#c5c5c5"
+        android:textSize="14sp" />
 
     <EditText
         android:id="@+id/password_et"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="15dp"
         android:background="@drawable/shape_gray_corner"
-        android:drawableStart="@mipmap/ic_launcher"
-        android:drawablePadding="5dp"
+        android:drawableStart="@drawable/password_id_icon"
+        android:drawablePadding="10dp"
         android:hint="请输入密码"
         android:inputType="textPassword"
         android:padding="5dp" />
@@ -54,8 +55,8 @@
     <LinearLayout
         android:id="@+id/rememberPassword_ly"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_height="40dp"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <CheckBox
@@ -68,13 +69,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="记住密码" />
+            android:text="记住密码"
+            android:textColor="@color/text_gray"
+            android:textSize="12sp" />
     </LinearLayout>
 
     <Button
         android:id="@+id/login_btn"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:text="登录"
         android:textColor="@color/white" />
 </LinearLayout>

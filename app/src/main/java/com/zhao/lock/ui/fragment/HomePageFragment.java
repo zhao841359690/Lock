@@ -50,7 +50,7 @@ public class HomePageFragment extends BaseFragment {
 
     @Override
     protected void initView() {
-        pendingTv.setText(Html.fromHtml("您有一条<font color='#FF0000'>[待操作]</font>的订单"));
+        pendingTv.setText(Html.fromHtml("您有一条<font color='#0E5EAB'>[待操作]</font>的订单"));
     }
 
     @OnClick({R.id.scan_code_ly, R.id.ble_scan_ly, R.id.pending_ly})
