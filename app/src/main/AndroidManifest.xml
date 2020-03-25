@@ -26,6 +26,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.MainActivity" />
+        <activity android:name=".ui.activity.NewTicketActivity" />
         <activity android:name=".ui.activity.LockActivity" />
         <activity android:name=".ScanActivity" />
     </application>

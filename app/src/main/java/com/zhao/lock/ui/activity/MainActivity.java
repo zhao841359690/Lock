@@ -1,6 +1,7 @@
 package com.zhao.lock.ui.activity;
 
 
+import android.content.Intent;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -21,6 +22,8 @@ import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity implements HomePageFragment.OnHomePageFragmentClickListener, MineFragment.OnMineFragmentClickListener {
 
+    @BindView(R.id.toolbar)
+    LinearLayout toolBar;
     @BindView(R.id.title_tv)
     TextView titleTv;
     @BindView(R.id.fragment_group)
@@ -31,6 +34,12 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
     ImageView homePageIv;
     @BindView(R.id.home_page_tv)
     TextView homePageTv;
+    @BindView(R.id.new_ticket_ly)
+    LinearLayout newTicketLy;
+    @BindView(R.id.new_ticket_iv)
+    ImageView newTicketIv;
+    @BindView(R.id.new_ticket_tv)
+    TextView newTicketTv;
     @BindView(R.id.mine_ly)
     LinearLayout mineLy;
     @BindView(R.id.mine_iv)
@@ -55,11 +64,15 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
         showFragment(Constants.TYPE_HOME_PAGE);
     }
 
-    @OnClick({R.id.home_page_ly, R.id.mine_ly})
+    @OnClick({R.id.home_page_ly, R.id.new_ticket_ly, R.id.mine_ly})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.home_page_ly:
                 showFragment(Constants.TYPE_HOME_PAGE);
+                break;
+            case R.id.new_ticket_ly:
+                Intent intent = new Intent(this, NewTicketActivity.class);
+                startActivityForResult(intent, 1);
                 break;
             case R.id.mine_ly:
                 showFragment(Constants.TYPE_MINE);
@@ -103,6 +116,8 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
         mLastFgIndex = index;
         switch (index) {
             case Constants.TYPE_HOME_PAGE:
+                toolBar.setVisibility(View.VISIBLE);
+                titleTv.setVisibility(View.VISIBLE);
                 titleTv.setText("首页");
                 if (homePageFragment == null) {
                     homePageFragment = HomePageFragment.newInstance();
@@ -112,6 +127,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
                 transaction.show(homePageFragment);
                 break;
             case Constants.TYPE_MINE:
+                toolBar.setVisibility(View.GONE);
                 if (mineFragment == null) {
                     mineFragment = MineFragment.newInstance();
                     transaction.add(R.id.fragment_group, mineFragment);
@@ -120,6 +136,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
                 transaction.show(mineFragment);
                 break;
             case Constants.TYPE_ABOUT:
+                toolBar.setVisibility(View.VISIBLE);
                 titleTv.setText("关于软件");
                 if (aboutFragment == null) {
                     aboutFragment = AboutFragment.newInstance();
@@ -128,6 +145,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
                 transaction.show(aboutFragment);
                 break;
             case Constants.TYPE_MY_TICKET:
+                toolBar.setVisibility(View.VISIBLE);
                 titleTv.setText("我的工单");
                 if (myTicketFragment == null) {
                     myTicketFragment = MyTicketFragment.newInstance();
