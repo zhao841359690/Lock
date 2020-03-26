@@ -35,17 +35,29 @@
             android:name="notch.config"
             android:value="portrait|landscape" />
 
-        <activity android:name=".ui.activity.LoginActivity">
+        <activity
+            android:name=".ui.activity.LoginActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.MainActivity" />
-        <activity android:name=".ui.activity.ScanCodeActivity" />
-        <activity android:name=".ui.activity.NoTicketActivity" />
-        <activity android:name=".ui.activity.NewTicketActivity" />
-        <activity android:name=".ui.activity.LockActivity" />
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.activity.ScanCodeActivity"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.activity.NoTicketActivity"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.activity.NewTicketActivity"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.activity.LockActivity"
+            android:launchMode="singleTask" />
     </application>
 </manifest>

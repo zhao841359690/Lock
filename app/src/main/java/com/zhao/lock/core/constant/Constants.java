@@ -14,6 +14,8 @@ public class Constants {
     public static final int SCAN_CODE = 1;
     public static final int NEW_TICKET = 2;
     public static final int NO_TICKET = 3;
+    public static final int CASH_DRAWER_NUMBER = 4;
+    public static final int LOCK_BODY_NUMBER = 5;
 
     public static final int OPEN = 0;
     public static final int CLOSE = 1;

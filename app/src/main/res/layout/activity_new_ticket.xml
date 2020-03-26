@@ -17,6 +17,7 @@
             android:id="@+id/cash_drawer_number_et"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:layout_weight="1"
             android:background="@null"
             android:hint="请输入钱箱编号"
@@ -27,6 +28,7 @@
             android:id="@+id/cash_drawer_number_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
             android:src="@mipmap/ic_launcher" />
     </LinearLayout>
 
@@ -44,6 +46,7 @@
             android:id="@+id/lock_body_number_et"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:layout_weight="1"
             android:background="@null"
             android:hint="请输入锁体编号"
@@ -54,6 +57,7 @@
             android:id="@+id/lock_body_number_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
             android:src="@mipmap/ic_launcher" />
     </LinearLayout>
 
@@ -69,16 +73,19 @@
         android:gravity="center">
 
         <TextView
+            android:id="@+id/time_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:layout_weight="1"
-            android:text="请选择操作时间"
+            android:hint="请选择操作时间"
             android:textColor="#AFAFAF"
             android:textSize="16sp" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
             android:src="@mipmap/ic_launcher" />
     </LinearLayout>
 
@@ -94,16 +101,19 @@
         android:gravity="center">
 
         <TextView
+            android:id="@+id/type_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:layout_weight="1"
-            android:text="请选择任务类型"
+            android:hint="请选择任务类型"
             android:textColor="#AFAFAF"
             android:textSize="16sp" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
             android:src="@mipmap/ic_launcher" />
     </LinearLayout>
 
