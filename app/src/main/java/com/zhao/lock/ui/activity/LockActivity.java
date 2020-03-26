@@ -59,7 +59,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     @Override
     protected void initView() {
 //        initBle();
-//        mBle.connect(address, connectCallback);
 
         titleLeftIv.setVisibility(View.VISIBLE);
         titleLineView.setVisibility(View.GONE);
@@ -85,6 +84,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 finish();
                 break;
             case R.id.lock_ly:
+//                mBle.connect(address, connectCallback);
                 TipDialog tipDialog = new TipDialog(this, this);
                 tipDialog.show();
                 break;
