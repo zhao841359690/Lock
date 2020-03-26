@@ -19,7 +19,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
         ImmersionBar.with(this)
-                .statusBarColor(R.color.white)
                 .statusBarDarkFont(true)
                 .statusBarView(findViewById(R.id.status_bar_view))
                 .keyboardEnable(true)
