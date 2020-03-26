@@ -74,7 +74,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mBle.destory(this);
+//        mBle.destory(this);
     }
 
     @OnClick({R.id.title_left_rl, R.id.lock_ly})

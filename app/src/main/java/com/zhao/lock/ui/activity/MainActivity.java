@@ -168,7 +168,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
                 toolBar.setVisibility(View.VISIBLE);
                 titleTv.setVisibility(View.VISIBLE);
                 titleTv.setText("首页");
-                homePageIv.setImageResource(R.drawable.home_active);
+                homePageIv.setImageResource(R.drawable.home_pitch_icon);
                 if (homePageFragment == null) {
                     homePageFragment = HomePageFragment.newInstance();
                     transaction.add(R.id.fragment_group, homePageFragment);
@@ -221,7 +221,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
     }
 
     private void hideFragment(FragmentTransaction transaction) {
-        homePageIv.setImageResource(R.drawable.home_normal);
+        homePageIv.setImageResource(R.drawable.home_normal_icon);
         mineIv.setImageResource(R.drawable.me_normal_icon);
 
         switch (mLastFgIndex) {
