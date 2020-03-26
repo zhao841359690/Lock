@@ -85,6 +85,8 @@ public class NewTicketActivity extends BaseActivity {
                 timeTv.setText(time);
             }
         }).isCenterLabel(true)
+                .setType(new boolean[]{true, true, true, true, true, false}) //年月日时分秒 的显示与否，不设置则默认全部显示
+                .setLabel("年", "月", "日", "时", "分", "")
                 .setSubmitText("确定")//确定按钮文字
                 .setCancelText("取消")//取消按钮文字
                 .build();
