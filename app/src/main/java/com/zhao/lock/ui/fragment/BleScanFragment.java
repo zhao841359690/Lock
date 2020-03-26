@@ -53,7 +53,7 @@ public class BleScanFragment extends BaseFragment implements BleScanAdapter.OnIt
     }
 
     public interface OnBleScanFragmentClickListener {
-        void onAccessClick();
+        void onAccessClick(int type);
     }
 
     @Override
@@ -65,8 +65,14 @@ public class BleScanFragment extends BaseFragment implements BleScanAdapter.OnIt
 
         mRecyclerView.setAdapter(mAdapter);
 
-        initBle();
-        scan();
+//        initBle();
+//        scan();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBle.destory(BaseApp.getContext());
     }
 
     @OnClick(R.id.retry_tv)
@@ -75,8 +81,8 @@ public class BleScanFragment extends BaseFragment implements BleScanAdapter.OnIt
     }
 
     @Override
-    public void onItemClick() {
-        onBleScanFragmentClickListener.onAccessClick();
+    public void onItemClick(int position) {
+        onBleScanFragmentClickListener.onAccessClick(position);
     }
 
     private void initBle() {

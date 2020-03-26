@@ -46,15 +46,23 @@ public class BleScanAdapter extends RecyclerView.Adapter<BleScanAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull BleScanAdapter.ViewHolder viewHolder, int position) {
-        BleDevice bleScanBean = bleDeviceList.get(position);
-
-        viewHolder.titleTv.setText(bleScanBean.getBleName());
-        viewHolder.contentTv.setText(bleScanBean.getBleAddress());
+        final int i = position;
+//        BleDevice bleScanBean = bleDeviceList.get(position);
+//
+//        viewHolder.titleTv.setText(bleScanBean.getBleName());
+//        viewHolder.contentTv.setText(bleScanBean.getBleAddress());
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onItemClickListener.onItemClick(i);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return bleDeviceList == null ? 0 : bleDeviceList.size();
+//        return bleDeviceList == null ? 0 : bleDeviceList.size();
+        return 3;
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -72,6 +80,6 @@ public class BleScanAdapter extends RecyclerView.Adapter<BleScanAdapter.ViewHold
     }
 
     public interface OnItemClickListener {
-        void onItemClick();
+        void onItemClick(int position);
     }
 }

@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -26,8 +27,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.MainActivity" />
+        <activity android:name=".ui.activity.ScanCodeActivity" />
+        <activity android:name=".ui.activity.NoTicketActivity" />
         <activity android:name=".ui.activity.NewTicketActivity" />
         <activity android:name=".ui.activity.LockActivity" />
-        <activity android:name=".ScanActivity" />
     </application>
 </manifest>

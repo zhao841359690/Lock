@@ -58,6 +58,8 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
     private MineFragment mineFragment;
     private AboutFragment aboutFragment;
     private MyTicketFragment myTicketFragment;
+    private String myTicketTitle = "我的工单";
+
     private BleScanFragment bleScanFragment;
 
     private int mLastFgIndex = -1;
@@ -93,13 +95,30 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Constants.NEW_TICKET && resultCode == Constants.NEW_TICKET) {
+            myTicketTitle = "我的工单";
             showFragment(Constants.TYPE_MY_TICKET);
+        } else if (requestCode == Constants.NO_TICKET && resultCode == Constants.NO_TICKET) {
+            Intent intent = new Intent(this, NewTicketActivity.class);
+            startActivityForResult(intent, Constants.NEW_TICKET);
+        } else if (requestCode == Constants.SCAN_CODE && resultCode == Constants.SCAN_CODE) {
+            if (data != null) {
+                String result = data.getStringExtra("result");
+
+                if ("1".equals(result)) {
+                    myTicketTitle = "MPDTC-XXXXXX的工单";
+                    showFragment(Constants.TYPE_MY_TICKET);
+                } else {
+                    Intent intent = new Intent(this, NoTicketActivity.class);
+                    startActivityForResult(intent, Constants.NO_TICKET);
+                }
+            }
         }
     }
 
     @Override
     public void onScanCodeClick() {
-
+        Intent intent = new Intent(this, ScanCodeActivity.class);
+        startActivityForResult(intent, Constants.SCAN_CODE);
     }
 
     @Override
@@ -109,11 +128,13 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
 
     @Override
     public void onPendingClick() {
+        myTicketTitle = "我的工单";
         showFragment(Constants.TYPE_MY_TICKET);
     }
 
     @Override
     public void onMyTicketClick() {
+        myTicketTitle = "我的工单";
         showFragment(Constants.TYPE_MY_TICKET);
     }
 
@@ -128,8 +149,14 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
     }
 
     @Override
-    public void onAccessClick() {
-        showFragment(Constants.TYPE_MY_TICKET);
+    public void onAccessClick(int position) {
+        if (position == 0) {
+            Intent intent = new Intent(this, NoTicketActivity.class);
+            startActivityForResult(intent, Constants.NO_TICKET);
+        } else {
+            myTicketTitle = "MPDTC-XXXXXX的工单";
+            showFragment(Constants.TYPE_MY_TICKET);
+        }
     }
 
     private void showFragment(int index) {
@@ -180,7 +207,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
                 break;
             case Constants.TYPE_MY_TICKET:
                 toolBar.setVisibility(View.VISIBLE);
-                titleTv.setText("我的工单");
+                titleTv.setText(myTicketTitle);
                 if (myTicketFragment == null) {
                     myTicketFragment = MyTicketFragment.newInstance();
                     transaction.add(R.id.fragment_group, myTicketFragment);
@@ -229,7 +256,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
     }
 
     private void getPermission() {
-        SoulPermission.getInstance().checkAndRequestPermissions(Permissions.build(Manifest.permission.ACCESS_COARSE_LOCATION)
+        SoulPermission.getInstance().checkAndRequestPermissions(Permissions.build(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA)
                 , new CheckRequestPermissionsListener() {
                     @Override
                     public void onAllPermissionOk(Permission[] allPermissions) {
