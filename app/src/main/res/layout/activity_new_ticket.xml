@@ -29,12 +29,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
-            android:src="@mipmap/ic_launcher" />
+            android:src="@drawable/sweep_icon_btn" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
         android:background="@color/gray" />
 
     <LinearLayout
@@ -58,27 +58,27 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
-            android:src="@mipmap/ic_launcher" />
+            android:src="@drawable/sweep_icon_btn" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
         android:background="@color/gray" />
 
     <LinearLayout
-        android:id="@+id/time_ly"
+        android:id="@+id/start_time_ly"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:gravity="center">
 
         <TextView
-            android:id="@+id/time_tv"
+            android:id="@+id/start_time_tv"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_weight="1"
-            android:hint="请选择操作时间"
+            android:hint="请选择开始时间"
             android:textColor="#AFAFAF"
             android:textSize="16sp" />
 
@@ -91,7 +91,35 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
+        android:background="@color/gray" />
+
+    <LinearLayout
+        android:id="@+id/end_time_ly"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/end_time_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            android:hint="请选择结束时间"
+            android:textColor="#AFAFAF"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:src="@mipmap/ic_launcher" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
         android:background="@color/gray" />
 
     <LinearLayout
@@ -119,6 +147,6 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
+        android:layout_height="0.5dp"
         android:background="@color/gray" />
 </LinearLayout>

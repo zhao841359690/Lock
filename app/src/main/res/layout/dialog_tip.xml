@@ -20,7 +20,8 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_gravity="center"
-        android:layout_marginTop="20dp" />
+        android:layout_marginTop="20dp"
+        android:src="@drawable/open_lock_icon" />
 
     <TextView
         android:id="@+id/content_tv"
@@ -44,8 +45,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@drawable/shape_gradation_blue"
             android:gravity="center"
             android:padding="5dp"
+            android:textColor="@color/white"
             android:textSize="15sp" />
 
         <TextView

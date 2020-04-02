@@ -38,7 +38,7 @@ public class TipDialog extends Dialog implements View.OnClickListener {
         titleTv.setText("开锁提醒");
 
         lockIv = findViewById(R.id.lock_iv);
-        lockIv.setImageResource(R.drawable.add_order_active_btn);
+        lockIv.setImageResource(R.drawable.open_lock_icon);
 
         contentTv = findViewById(R.id.content_tv);
         contentTv.setText(Html.fromHtml("编号:<font color='#0E5EAB'>ADC123456</font>锁体已连接,<br/>请确认开锁!"));

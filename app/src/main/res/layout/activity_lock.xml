@@ -112,7 +112,7 @@
             android:id="@+id/lock_iv"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:src="@drawable/add_order_active_btn" />
+            android:src="@drawable/link_lock_btn_normal" />
 
         <TextView
             android:layout_width="wrap_content"

@@ -44,16 +44,20 @@ public class NewTicketActivity extends BaseActivity {
     EditText lockBodyNumberEt;
     @BindView(R.id.lock_body_number_iv)
     ImageView lockBodyNumberIv;
-    @BindView(R.id.time_ly)
-    LinearLayout timeLy;
-    @BindView(R.id.time_tv)
-    TextView timeTv;
+    @BindView(R.id.start_time_ly)
+    LinearLayout startTimeLy;
+    @BindView(R.id.start_time_tv)
+    TextView startTimeTv;
+    @BindView(R.id.end_time_ly)
+    LinearLayout endTimeLy;
+    @BindView(R.id.end_time_tv)
+    TextView endTimeTv;
     @BindView(R.id.type_ly)
     LinearLayout typeLy;
     @BindView(R.id.type_tv)
     TextView typeTv;
 
-    private boolean isHasCashDrawerNumber, isHasLockBodyNumber, isHasTime, isHasType;
+    private boolean isHasCashDrawerNumber, isHasLockBodyNumber, isHasStartTime, isHasEndTime, isHasType;
 
     private Intent intent;
     private TimePickerView timePickerView;
@@ -75,24 +79,26 @@ public class NewTicketActivity extends BaseActivity {
 
         cashDrawerNumberEt.addTextChangedListener(textChangeListener(cashDrawerNumberEt));
         lockBodyNumberEt.addTextChangedListener(textChangeListener(lockBodyNumberEt));
-        timeTv.addTextChangedListener(textChangeListener(timeTv));
+        startTimeTv.addTextChangedListener(textChangeListener(startTimeTv));
+        endTimeTv.addTextChangedListener(textChangeListener(endTimeTv));
         typeTv.addTextChangedListener(textChangeListener(typeTv));
 
         timePickerView = new TimePickerView.Builder(this, new TimePickerView.OnTimeSelectListener() {
             @Override
             public void onTimeSelect(Date date, View v) {
                 String time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-                timeTv.setText(time);
+                TextView textView = (TextView) v;
+                textView.setText(time);
             }
         }).isCenterLabel(true)
                 .setType(new boolean[]{true, true, true, true, true, false}) //年月日时分秒 的显示与否，不设置则默认全部显示
-                .setLabel("年", "月", "日", "时", "分", "")
+                .setLabel("年", "月", "日", ":", "", "")
                 .setSubmitText("确定")//确定按钮文字
                 .setCancelText("取消")//取消按钮文字
                 .build();
     }
 
-    @OnClick({R.id.title_left_rl, R.id.title_right_tv, R.id.cash_drawer_number_iv, R.id.lock_body_number_iv, R.id.time_ly, R.id.type_ly})
+    @OnClick({R.id.title_left_rl, R.id.title_right_tv, R.id.cash_drawer_number_iv, R.id.lock_body_number_iv, R.id.start_time_ly, R.id.end_time_ly, R.id.type_ly})
     public void onViewClicked(View view) {
         KeyboardUtils.hideKeyboard(titleTv);
         switch (view.getId()) {
@@ -100,7 +106,7 @@ public class NewTicketActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.title_right_tv:
-                if (isHasCashDrawerNumber && isHasLockBodyNumber && isHasTime && isHasType) {
+                if (isHasCashDrawerNumber && isHasLockBodyNumber && isHasStartTime && isHasEndTime && isHasType) {
                     setResult(Constants.NEW_TICKET);
                     finish();
                 }
@@ -113,9 +119,13 @@ public class NewTicketActivity extends BaseActivity {
                 intent = new Intent(this, ScanCodeActivity.class);
                 startActivityForResult(intent, Constants.LOCK_BODY_NUMBER);
                 break;
-            case R.id.time_ly:
+            case R.id.start_time_ly:
                 timePickerView.setDate(Calendar.getInstance());
-                timePickerView.show();
+                timePickerView.show(startTimeTv);
+                break;
+            case R.id.end_time_ly:
+                timePickerView.setDate(Calendar.getInstance());
+                timePickerView.show(endTimeTv);
                 break;
             case R.id.type_ly:
                 final String[] items = {"开锁", "关锁"};
@@ -166,13 +176,15 @@ public class NewTicketActivity extends BaseActivity {
                     isHasCashDrawerNumber = s.length() > 0;
                 } else if (view == lockBodyNumberEt) {
                     isHasLockBodyNumber = s.length() > 0;
-                } else if (view == timeTv) {
-                    isHasTime = s.length() > 0;
+                } else if (view == startTimeTv) {
+                    isHasStartTime = s.length() > 0;
+                } else if (view == endTimeTv) {
+                    isHasEndTime = s.length() > 0;
                 } else if (view == typeTv) {
                     isHasType = s.length() > 0;
                 }
 
-                if (isHasCashDrawerNumber && isHasLockBodyNumber && isHasTime && isHasType) {
+                if (isHasCashDrawerNumber && isHasLockBodyNumber && isHasStartTime && isHasEndTime && isHasType) {
                     titleRightTv.setTextColor(getColor(R.color.text_blue));
                 } else {
                     titleRightTv.setTextColor(getColor(R.color.text_light_blue));

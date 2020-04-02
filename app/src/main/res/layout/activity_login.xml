@@ -16,14 +16,14 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp">
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp">
 
         <ImageView
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_centerInParent="true"
-            android:src="@mipmap/ic_launcher" />
+            android:src="@drawable/index_icon" />
 
     </RelativeLayout>
 
@@ -31,8 +31,8 @@
         android:id="@+id/phoneNumber_et"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
         android:background="@drawable/shape_gray_corner"
         android:drawableStart="@drawable/phone_id_icon"
         android:drawablePadding="10dp"
@@ -46,21 +46,22 @@
         android:id="@+id/password_et"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="40dp"
         android:layout_marginTop="15dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginEnd="40dp"
         android:background="@drawable/shape_gray_corner"
         android:drawableStart="@drawable/password_id_icon"
         android:drawablePadding="10dp"
         android:hint="请输入密码"
         android:inputType="textPassword"
-        android:padding="5dp" />
+        android:padding="5dp"
+        android:textSize="14sp" />
 
     <LinearLayout
         android:id="@+id/rememberPassword_ly"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="40dp"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -83,8 +84,9 @@
         android:id="@+id/login_btn"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:background="@drawable/shape_gradation_blue"
         android:text="登录"
         android:textColor="@color/white" />
 </LinearLayout>
