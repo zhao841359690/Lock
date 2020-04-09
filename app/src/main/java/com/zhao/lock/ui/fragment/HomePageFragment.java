@@ -8,9 +8,13 @@ import android.widget.TextView;
 
 import com.zhao.lock.R;
 import com.zhao.lock.base.BaseFragment;
+import com.zhao.lock.bean.TodoOrdersBean;
+import com.zhao.lock.core.constant.Constants;
+import com.zhao.lock.util.SharedPreferencesUtils;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import rxhttp.wrapper.param.RxHttp;
 
 public class HomePageFragment extends BaseFragment {
 
@@ -51,7 +55,20 @@ public class HomePageFragment extends BaseFragment {
 
     @Override
     protected void initView() {
-        pendingTv.setText(Html.fromHtml("您有一条<font color='#0E5EAB'>[待操作]</font>的订单"));
+        RxHttp.get(Constants.BASE_URL + "/app/todoOrders")
+                .add("token", SharedPreferencesUtils.getInstance().getToken())
+                .asClass(TodoOrdersBean.class)
+                .subscribe(todoOrdersBean -> {
+                    if (todoOrdersBean.getCode() == 200 && todoOrdersBean.getData() != null && todoOrdersBean.getData().size() > 0) {
+                        pendingCv.setVisibility(View.VISIBLE);
+                        pendingTv.setText(Html.fromHtml("您有" + todoOrdersBean.getData().size() + "条<font color='#0E5EAB'>[待操作]</font>的订单"));
+                    } else {
+                        pendingCv.setVisibility(View.GONE);
+                    }
+                }, throwable -> {
+                    pendingCv.setVisibility(View.GONE);
+                });
+
     }
 
     @OnClick({R.id.scan_code_ly, R.id.ble_scan_ly, R.id.pending_cv})

@@ -1,22 +1,19 @@
 package com.zhao.lock.ui.fragment;
 
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.bumptech.glide.request.RequestOptions;
 import com.zhao.lock.R;
-import com.zhao.lock.app.BaseApp;
 import com.zhao.lock.base.BaseFragment;
-import com.zhao.lock.util.GlideCircleTransform;
+import com.zhao.lock.bean.UserInfoBean;
+import com.zhao.lock.core.constant.Constants;
+import com.zhao.lock.util.SharedPreferencesUtils;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import rxhttp.wrapper.param.RxHttp;
 
 public class MineFragment extends BaseFragment {
 
@@ -56,11 +53,15 @@ public class MineFragment extends BaseFragment {
 
     @Override
     protected void initView() {
-        Glide.with(BaseApp.getContext()).load(R.mipmap.ic_launcher)
-                .apply(new RequestOptions().error(BaseApp.getContext().getDrawable(R.mipmap.ic_launcher)))
-                .placeholder(R.mipmap.ic_launcher).centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL)
-                .transform(new GlideCircleTransform(6, BaseApp.getContext().getColor(R.color.head)))
-                .into(headIv);
+        RxHttp.get(Constants.BASE_URL + "/app/userInfo")
+                .add("token", SharedPreferencesUtils.getInstance().getToken())
+                .asClass(UserInfoBean.class)
+                .subscribe(userInfoBean -> {
+                    if (userInfoBean.getCode() == 200) {
+                        nameTv.setText(userInfoBean.getData().getUsername());
+                    }
+                }, throwable -> {
+                });
     }
 
     @OnClick({R.id.my_ticket_tv, R.id.about_rl, R.id.sign_out_tv})

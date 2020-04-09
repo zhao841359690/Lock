@@ -16,8 +16,10 @@ import android.widget.TextView;
 import com.bigkoo.pickerview.TimePickerView;
 import com.zhao.lock.R;
 import com.zhao.lock.base.BaseActivity;
+import com.zhao.lock.bean.UserInfoBean;
 import com.zhao.lock.core.constant.Constants;
 import com.zhao.lock.util.KeyboardUtils;
+import com.zhao.lock.util.SharedPreferencesUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -25,6 +27,7 @@ import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import rxhttp.wrapper.param.RxHttp;
 
 public class NewTicketActivity extends BaseActivity {
     @BindView(R.id.title_left_rl)
@@ -107,6 +110,18 @@ public class NewTicketActivity extends BaseActivity {
                 break;
             case R.id.title_right_tv:
                 if (isHasCashDrawerNumber && isHasLockBodyNumber && isHasStartTime && isHasEndTime && isHasType) {
+                    String boxId = cashDrawerNumberEt.getText().toString().trim();
+                    String uId = lockBodyNumberEt.getText().toString().trim();
+                    String effectTime = startTimeTv.getText().toString().trim();
+                    String invalidTime = endTimeTv.getText().toString().trim();
+                    String operationType = typeTv.getText().toString().trim();
+                    RxHttp.postForm(Constants.BASE_URL + "/app/workOrder")
+                            .add("token", SharedPreferencesUtils.getInstance().getToken())
+                            .add("boxId", boxId)
+                            .add("uId", uId)
+                            .add("effectTime", effectTime)
+                            .add("invalidTime", invalidTime)
+                            .add("operationType", operationType);
                     setResult(Constants.NEW_TICKET);
                     finish();
                 }

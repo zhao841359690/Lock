@@ -1,6 +1,7 @@
 package com.zhao.lock.core.constant;
 
 public class Constants {
+    public static final String BASE_URL = "http://61.174.28.14:10072";
 
     /**
      * Tag fragment

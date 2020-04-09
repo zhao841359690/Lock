@@ -2,6 +2,7 @@ package com.zhao.lock.ui.activity;
 
 import android.content.Intent;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -11,9 +12,13 @@ import android.widget.Toast;
 
 import com.zhao.lock.R;
 import com.zhao.lock.base.BaseActivity;
+import com.zhao.lock.bean.LoginBean;
+import com.zhao.lock.core.constant.Constants;
+import com.zhao.lock.util.SharedPreferencesUtils;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import rxhttp.wrapper.param.RxHttp;
 
 public class LoginActivity extends BaseActivity {
 
@@ -59,9 +64,24 @@ public class LoginActivity extends BaseActivity {
 //                    Toast.makeText(this, "请输入您的密码", Toast.LENGTH_SHORT).show();
 //                    return;
 //                }
-                Intent intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
-                finish();
+//                RxHttp.postForm(Constants.BASE_URL + "/app/login")
+//                        .addHeader("Content-Type", "application/json")
+//                        .add("username", phoneNumber)
+//                        .add("password", password)
+//                        .asClass(LoginBean.class)
+//                        .subscribe(loginBean -> {
+//                            if (loginBean.getCode() == 200) {
+//                                SharedPreferencesUtils.getInstance().setToken(loginBean.getData().getToken());
+
+                                Intent intent = new Intent(this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
+//                            } else {
+//                                Toast.makeText(this, loginBean.getMsg(), Toast.LENGTH_SHORT).show();
+//                            }
+//                        }, throwable -> {
+//
+//                        });
                 break;
             default:
                 break;
