@@ -1,6 +1,9 @@
 package com.zhao.lock.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
@@ -13,6 +16,7 @@ import com.zhao.lock.R;
 import com.zhao.lock.base.BaseActivity;
 import com.zhao.lock.core.constant.Constants;
 import com.zhao.lock.ui.dialog.TipDialog;
+import com.zhao.lock.util.AESUtils;
 
 import java.util.UUID;
 
@@ -50,6 +54,27 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private Ble<BleDevice> mBle;
     private BleDevice mBleDevice;
     private String address;
+
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            boolean result = mBle.write(mBleDevice, AESUtils.write((byte) 0x01), new BleWriteCallback<BleDevice>() {
+                @Override
+                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                    if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
+                        AESUtils.getRead(characteristic.getValue());
+                        Toast.makeText(LockActivity.this, "写入加密数据成功", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+
+            if (!result) {
+                Toast.makeText(LockActivity.this, "写入加密数据失败", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
 
     @Override
     protected int getLayoutId() {
@@ -138,6 +163,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void onConnectionChanged(BleDevice device) {
             mBleDevice = device;
+            handler.sendEmptyMessageDelayed(0, 2000);
         }
 
         @Override
