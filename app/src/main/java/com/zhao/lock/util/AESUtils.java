@@ -143,22 +143,9 @@ public class AESUtils {
 
     private static byte[] bytes17to16(byte[] bytes) {
         byte[] decrypt = new byte[16];
-        decrypt[0] = bytes[0];
-        decrypt[1] = bytes[1];
-        decrypt[2] = bytes[2];
-        decrypt[3] = bytes[3];
-        decrypt[4] = bytes[4];
-        decrypt[5] = bytes[5];
-        decrypt[6] = bytes[6];
-        decrypt[7] = bytes[7];
-        decrypt[8] = bytes[8];
-        decrypt[9] = bytes[9];
-        decrypt[10] = bytes[10];
-        decrypt[11] = bytes[11];
-        decrypt[12] = bytes[12];
-        decrypt[13] = bytes[13];
-        decrypt[14] = bytes[14];
-        decrypt[15] = bytes[15];
+        for (int i = 0; i < bytes.length - 1; i++) {
+            decrypt[i] = bytes[i];
+        }
         return decrypt;
     }
 }
