@@ -94,13 +94,13 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Constants.NEW_TICKET && resultCode == Constants.NEW_TICKET) {
+        if (requestCode == Constants.NEW_TICKET && resultCode == Constants.NEW_TICKET) {//新建工单回调
             myTicketTitle = "我的工单";
             showFragment(Constants.TYPE_MY_TICKET);
-        } else if (requestCode == Constants.NO_TICKET && resultCode == Constants.NO_TICKET) {
+        } else if (requestCode == Constants.NO_TICKET && resultCode == Constants.NO_TICKET) {//订单为空回调
             Intent intent = new Intent(this, NewTicketActivity.class);
             startActivityForResult(intent, Constants.NEW_TICKET);
-        } else if (requestCode == Constants.SCAN_CODE && resultCode == Constants.SCAN_CODE) {
+        } else if (requestCode == Constants.SCAN_CODE && resultCode == Constants.SCAN_CODE) {//扫码回调
             if (data != null) {
                 String result = data.getStringExtra("result");
 
@@ -115,34 +115,40 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
         }
     }
 
+    //扫码
     @Override
     public void onScanCodeClick() {
         Intent intent = new Intent(this, ScanCodeActivity.class);
         startActivityForResult(intent, Constants.SCAN_CODE);
     }
 
+    //Ble扫描
     @Override
     public void onBleScanClick() {
         showFragment(Constants.TYPE_BLE_SCAN);
     }
 
+    //待操作
     @Override
     public void onPendingClick() {
         myTicketTitle = "我的工单";
         showFragment(Constants.TYPE_MY_TICKET);
     }
 
+    //我的工单
     @Override
     public void onMyTicketClick() {
         myTicketTitle = "我的工单";
         showFragment(Constants.TYPE_MY_TICKET);
     }
 
+    //关于软件
     @Override
     public void onAboutClick() {
         showFragment(Constants.TYPE_ABOUT);
     }
 
+    //退出登录
     @Override
     public void onSignOutClick() {
         finish();
