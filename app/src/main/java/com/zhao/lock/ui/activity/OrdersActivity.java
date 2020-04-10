@@ -62,6 +62,7 @@ public class OrdersActivity extends BaseActivity implements OnRefreshListener, O
         mRecyclerView.setHasFixedSize(true);
 
         mRecyclerView.setAdapter(mAdapter);
+        initWorkOrdersData(currentPage);
     }
 
     @Override

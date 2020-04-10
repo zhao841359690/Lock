@@ -109,13 +109,13 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
                             List<TodoOrdersBean.DataBean> dataBeanList = new ArrayList<>();
 
                             for (TodoOrdersBean.DataBean datum : todoOrdersBean.getData()) {
-                                if (datum.getWorkId().equals(bleBean.getBleDevice().getBleAddress())) {
+                                if (datum.getLock().getBleMac().equals(bleBean.getBleDevice().getBleAddress())) {
                                     canFind = true;
                                     dataBeanList.add(datum);
                                 }
                             }
                             if (canFind) {
-                                Intent intent = new Intent(this, OrdersActivity.class);
+                                Intent intent = new Intent(this, TodoOrdersActivity.class);
                                 Bundle bundle = new Bundle();
                                 bundle.putSerializable("todo", (Serializable) dataBeanList);
                                 intent.putExtras(bundle);

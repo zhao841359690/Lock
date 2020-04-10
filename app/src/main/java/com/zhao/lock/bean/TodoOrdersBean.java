@@ -45,7 +45,6 @@ public class TodoOrdersBean implements Serializable {
 
     public static class DataBean implements Serializable {
         private String id;
-        private String createdBy;
         private String createdDate;
         private String lastModifiedBy;
         private String lastModifiedDate;
@@ -58,9 +57,10 @@ public class TodoOrdersBean implements Serializable {
         private String effectTime;
         private String invalidTime;
         private int expireMinute;
+        private boolean effective;
+        private LockBean lock;
         @SerializedName("new")
         private boolean newX;
-        private String uId;
 
         public String getId() {
             return id;
@@ -68,14 +68,6 @@ public class TodoOrdersBean implements Serializable {
 
         public void setId(String id) {
             this.id = id;
-        }
-
-        public String getCreatedBy() {
-            return createdBy;
-        }
-
-        public void setCreatedBy(String createdBy) {
-            this.createdBy = createdBy;
         }
 
         public String getCreatedDate() {
@@ -174,6 +166,22 @@ public class TodoOrdersBean implements Serializable {
             this.expireMinute = expireMinute;
         }
 
+        public boolean isEffective() {
+            return effective;
+        }
+
+        public void setEffective(boolean effective) {
+            this.effective = effective;
+        }
+
+        public LockBean getLock() {
+            return lock;
+        }
+
+        public void setLock(LockBean lock) {
+            this.lock = lock;
+        }
+
         public boolean isNewX() {
             return newX;
         }
@@ -182,12 +190,116 @@ public class TodoOrdersBean implements Serializable {
             this.newX = newX;
         }
 
-        public String getUId() {
-            return uId;
-        }
+        public static class LockBean implements Serializable {
+            private String id;
+            private String createdBy;
+            private String createdDate;
+            private String lastModifiedBy;
+            private String lastModifiedDate;
+            private String bleMac;
+            private String imei;
+            private String iccId;
+            private String archStatus;
+            private String power;
+            private String uid;
+            @SerializedName("new")
+            private boolean newX;
 
-        public void setUId(String uId) {
-            this.uId = uId;
+            public String getId() {
+                return id;
+            }
+
+            public void setId(String id) {
+                this.id = id;
+            }
+
+            public String getCreatedBy() {
+                return createdBy;
+            }
+
+            public void setCreatedBy(String createdBy) {
+                this.createdBy = createdBy;
+            }
+
+            public String getCreatedDate() {
+                return createdDate;
+            }
+
+            public void setCreatedDate(String createdDate) {
+                this.createdDate = createdDate;
+            }
+
+            public String getLastModifiedBy() {
+                return lastModifiedBy;
+            }
+
+            public void setLastModifiedBy(String lastModifiedBy) {
+                this.lastModifiedBy = lastModifiedBy;
+            }
+
+            public String getLastModifiedDate() {
+                return lastModifiedDate;
+            }
+
+            public void setLastModifiedDate(String lastModifiedDate) {
+                this.lastModifiedDate = lastModifiedDate;
+            }
+
+            public String getBleMac() {
+                return bleMac;
+            }
+
+            public void setBleMac(String bleMac) {
+                this.bleMac = bleMac;
+            }
+
+            public String getImei() {
+                return imei;
+            }
+
+            public void setImei(String imei) {
+                this.imei = imei;
+            }
+
+            public String getIccId() {
+                return iccId;
+            }
+
+            public void setIccId(String iccId) {
+                this.iccId = iccId;
+            }
+
+            public String getArchStatus() {
+                return archStatus;
+            }
+
+            public void setArchStatus(String archStatus) {
+                this.archStatus = archStatus;
+            }
+
+            public String getPower() {
+                return power;
+            }
+
+            public void setPower(String power) {
+                this.power = power;
+            }
+
+            public String getUid() {
+                return uid;
+            }
+
+            public void setUid(String uid) {
+                this.uid = uid;
+            }
+
+            public boolean isNewX() {
+                return newX;
+            }
+
+            public void setNewX(boolean newX) {
+                this.newX = newX;
+            }
         }
     }
 }

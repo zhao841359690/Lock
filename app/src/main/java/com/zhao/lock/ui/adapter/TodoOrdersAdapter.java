@@ -45,7 +45,7 @@ public class TodoOrdersAdapter extends RecyclerView.Adapter<TodoOrdersAdapter.Vi
 
         viewHolder.ticketNumberTv.setText("工单编号:" + dataBean.getWorkId());
         viewHolder.pendingTv.setVisibility(View.VISIBLE);
-        viewHolder.lockBodyNumberTv.setText("锁体编号:" + dataBean.getUId());
+        viewHolder.lockBodyNumberTv.setText("锁体编号:" + dataBean.getLock().getUid());
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
