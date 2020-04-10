@@ -46,7 +46,7 @@ public class AESUtils {
         return new byte[]{};
     }
 
-    public static byte[] write(byte type) {
+    public static byte[] getWrite(byte type) {
         byte[] bytes = new byte[16];
         bytes[0] = type;
 
@@ -56,10 +56,10 @@ public class AESUtils {
         bytes[4] = 0x01;
 
         if (type == 0x01) {
-            bytes[5] = 0x01;
-            bytes[6] = 0x01;
-            bytes[7] = 0x01;
-            bytes[8] = 0x01;
+            bytes[5] = 0x00;
+            bytes[6] = 0x00;
+            bytes[7] = 0x00;
+            bytes[8] = 0x00;
             bytes[9] = 0x00;
             bytes[10] = 0x00;
             bytes[11] = 0x00;
@@ -97,25 +97,15 @@ public class AESUtils {
 
         byte[] encrypt = encrypt(bytes, Constants.KEY);
 
-        byte[] bytes1 = new byte[17];
-        bytes1[0] = encrypt[0];
-        bytes1[1] = encrypt[1];
-        bytes1[2] = encrypt[2];
-        bytes1[3] = encrypt[3];
-        bytes1[4] = encrypt[4];
-        bytes1[5] = encrypt[5];
-        bytes1[6] = encrypt[6];
-        bytes1[7] = encrypt[7];
-        bytes1[8] = encrypt[8];
-        bytes1[9] = encrypt[9];
-        bytes1[10] = encrypt[10];
-        bytes1[11] = encrypt[11];
-        bytes1[12] = encrypt[12];
-        bytes1[13] = encrypt[13];
-        bytes1[14] = encrypt[14];
-        bytes1[15] = encrypt[15];
-        bytes1[16] = getXor(bytes);
-        return bytes1;
+        byte[] write = new byte[17];
+        for (int i = 0; i <= encrypt.length; i++) {
+            if (i == encrypt.length) {
+                write[i] = getXor(encrypt);
+            } else {
+                write[i] = encrypt[i];
+            }
+        }
+        return write;
     }
 
     private static byte getXor(byte[] bytes) {

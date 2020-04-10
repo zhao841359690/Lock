@@ -67,7 +67,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            boolean result = mBle.write(mBleDevice, AESUtils.write((byte) 0x01), new BleWriteCallback<BleDevice>() {
+            boolean result = mBle.write(mBleDevice, AESUtils.getWrite((byte) 0x01), new BleWriteCallback<BleDevice>() {
                 @Override
                 public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
                     if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
