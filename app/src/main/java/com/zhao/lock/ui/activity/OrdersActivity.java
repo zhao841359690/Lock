@@ -65,14 +65,6 @@ public class OrdersActivity extends BaseActivity implements OnRefreshListener, O
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        currentPage = 0;
-        workOrdersBeanList = new ArrayList<>();
-        initWorkOrdersData(currentPage);
-    }
-
-    @Override
     public void onRefresh(@NonNull RefreshLayout refreshLayout) {
         isRefresh = true;
         currentPage = 0;

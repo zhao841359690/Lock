@@ -58,6 +58,9 @@
             android:name=".ui.activity.OrdersActivity"
             android:launchMode="singleTask" />
         <activity
+            android:name=".ui.activity.TodoOrdersActivity"
+            android:launchMode="singleTask" />
+        <activity
             android:name=".ui.activity.NewTicketActivity"
             android:launchMode="singleTask" />
         <activity

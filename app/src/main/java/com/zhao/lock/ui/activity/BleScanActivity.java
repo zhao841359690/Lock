@@ -3,6 +3,7 @@ package com.zhao.lock.ui.activity;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -20,6 +21,7 @@ import com.zhao.lock.bean.TodoOrdersBean;
 import com.zhao.lock.ui.adapter.BleScanAdapter;
 import com.zhao.lock.util.SharedPreferencesUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -114,6 +116,9 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
                             }
                             if (canFind) {
                                 Intent intent = new Intent(this, OrdersActivity.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("todo", (Serializable) dataBeanList);
+                                intent.putExtras(bundle);
                                 startActivity(intent);
                                 finish();
                             } else {

@@ -9,22 +9,22 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.zhao.lock.R;
-import com.zhao.lock.bean.WorkOrdersBean;
+import com.zhao.lock.bean.TodoOrdersBean;
 
 import java.util.List;
 
-public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.ViewHolder> {
+public class TodoOrdersAdapter extends RecyclerView.Adapter<TodoOrdersAdapter.ViewHolder> {
     private Context context;
-    private List<WorkOrdersBean.DataBean.ContentBean> workOrdersBeanList;
+    private List<TodoOrdersBean.DataBean> dataBeanList;
 
     private OnItemClickListener onItemClickListener;
 
-    public MyTicketAdapter(Context context) {
+    public TodoOrdersAdapter(Context context) {
         this.context = context;
     }
 
-    public void setWorkOrdersBeanList(List<WorkOrdersBean.DataBean.ContentBean> workOrdersBeanList) {
-        this.workOrdersBeanList = workOrdersBeanList;
+    public void setDataBeanList(List<TodoOrdersBean.DataBean> dataBeanList) {
+        this.dataBeanList = dataBeanList;
         notifyDataSetChanged();
     }
 
@@ -34,35 +34,33 @@ public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.ViewHo
 
     @NonNull
     @Override
-    public MyTicketAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
+    public TodoOrdersAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_my_ticket_list, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyTicketAdapter.ViewHolder viewHolder, int position) {
-        WorkOrdersBean.DataBean.ContentBean contentBean = workOrdersBeanList.get(position);
+    public void onBindViewHolder(@NonNull TodoOrdersAdapter.ViewHolder viewHolder, int position) {
+        TodoOrdersBean.DataBean dataBean = dataBeanList.get(position);
 
-        viewHolder.ticketNumberTv.setText("工单编号:" + contentBean.getWorkId());
-        viewHolder.pendingTv.setVisibility(contentBean.isEffective() ? View.VISIBLE : View.INVISIBLE);
-        viewHolder.lockBodyNumberTv.setText("锁体编号:" + contentBean.getLock().getUid());
+        viewHolder.ticketNumberTv.setText("工单编号:" + dataBean.getWorkId());
+        viewHolder.pendingTv.setVisibility(View.VISIBLE);
+        viewHolder.lockBodyNumberTv.setText("锁体编号:" + dataBean.getUId());
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onItemClickListener.onItemClick(contentBean);
+                onItemClickListener.onItemClick(dataBean);
             }
         });
-
     }
 
     @Override
     public int getItemCount() {
-        return workOrdersBeanList == null ? 0 : workOrdersBeanList.size();
+        return dataBeanList == null ? 0 : dataBeanList.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-
         TextView ticketNumberTv;
         TextView pendingTv;
         TextView lockBodyNumberTv;
@@ -76,6 +74,6 @@ public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.ViewHo
     }
 
     public interface OnItemClickListener {
-        void onItemClick(WorkOrdersBean.DataBean.ContentBean contentBean);
+        void onItemClick(TodoOrdersBean.DataBean dataBean);
     }
 }

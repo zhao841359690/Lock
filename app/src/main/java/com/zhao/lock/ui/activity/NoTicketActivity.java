@@ -41,7 +41,7 @@ public class NoTicketActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.new_ticket_ly:
-                Intent intent = new Intent(this, OrdersActivity.class);
+                Intent intent = new Intent(this, NewTicketActivity.class);
                 startActivity(intent);
                 finish();
                 break;
