@@ -14,9 +14,12 @@ import android.widget.Toast;
 
 import com.zhao.lock.R;
 import com.zhao.lock.base.BaseActivity;
+import com.zhao.lock.bean.TodoOrdersBean;
+import com.zhao.lock.bean.WorkOrderBean;
 import com.zhao.lock.core.constant.Constants;
 import com.zhao.lock.ui.dialog.TipDialog;
 import com.zhao.lock.util.AESUtils;
+import com.zhao.lock.util.SharedPreferencesUtils;
 
 import java.util.UUID;
 
@@ -26,6 +29,8 @@ import cn.com.heaton.blelibrary.ble.Ble;
 import cn.com.heaton.blelibrary.ble.callback.BleConnectCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
 import cn.com.heaton.blelibrary.ble.model.BleDevice;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import rxhttp.wrapper.param.RxHttp;
 
 public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogClickListener {
     @BindView(R.id.title_left_rl)
@@ -34,6 +39,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     ImageView titleLeftIv;
     @BindView(R.id.title_line_View)
     View titleLineView;
+    @BindView(R.id.pending_ly)
+    LinearLayout pendingLy;
     @BindView(R.id.pending_tv)
     TextView pendingTv;
     @BindView(R.id.ticket_number_tv)
@@ -83,23 +90,52 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
     @Override
     protected void initView() {
-//        initBle();
+        initBle();
 
         titleLeftIv.setVisibility(View.VISIBLE);
         titleLineView.setVisibility(View.GONE);
 
-        pendingTv.setText(Html.fromHtml("您有一条<font color='#0E5EAB'>[待操作]</font>的订单"));
-        ticketNumberTv.setText("工单编号：ABC800214");
-        lockBodyNumberTv.setText("锁体编号：NB885607");
-        cabinetNumber.setText("箱体编号：AB123545");
-        timeTv.setText("2020.03.02 16:00 - 2020.03.02 17:30 ");
-        typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>开锁 - 关锁</font>"));
+        boolean showLock = getIntent().getBooleanExtra("showLock", false);
+        if (showLock) {
+            lockLy.setVisibility(View.VISIBLE);
+        } else {
+            lockLy.setVisibility(View.GONE);
+        }
+        String workId = getIntent().getStringExtra("workId");
+        RxHttp.get("/app/workOrder/" + workId)
+                .add("token", SharedPreferencesUtils.getInstance().getToken())
+                .asClass(WorkOrderBean.class)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(workOrderBean -> {
+                    address = workOrderBean.getData().getLock().getBleMac();
+
+                    ticketNumberTv.setText("工单编号：" + workOrderBean.getData().getWorkId());
+                    lockBodyNumberTv.setText("锁体编号：" + workOrderBean.getData().getLock().getUid());
+                    cabinetNumber.setText("箱体编号：" + workOrderBean.getData().getBoxId());
+                    timeTv.setText(workOrderBean.getData().getLock().getCreatedDate() + " - " + workOrderBean.getData().getLock().getLastModifiedDate());
+                    typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>" + ("0".equals(workOrderBean.getData().getLock().getArchStatus()) ? "关锁" : "开锁") + "</font>"));
+                }, throwable -> {
+                });
+        RxHttp.get("/app/todoOrders")
+                .add("token", SharedPreferencesUtils.getInstance().getToken())
+                .asClass(TodoOrdersBean.class)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(todoOrdersBean -> {
+                    if (todoOrdersBean.getCode() == 200 && todoOrdersBean.getData() != null && todoOrdersBean.getData().size() > 0) {
+                        pendingLy.setVisibility(View.VISIBLE);
+                        pendingTv.setText(Html.fromHtml("您有" + todoOrdersBean.getData().size() + "条<font color='#0E5EAB'>[待操作]</font>的订单"));
+                    } else {
+                        pendingLy.setVisibility(View.INVISIBLE);
+                    }
+                }, throwable -> {
+                    pendingLy.setVisibility(View.INVISIBLE);
+                });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        mBle.destory(this);
+        mBle.destory(this);
     }
 
     @OnClick({R.id.title_left_rl, R.id.lock_ly})
@@ -109,7 +145,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 finish();
                 break;
             case R.id.lock_ly:
-//                mBle.connect(address, connectCallback);
+                mBle.connect(address, connectCallback);
                 TipDialog tipDialog = new TipDialog(this, this);
                 tipDialog.show();
                 break;

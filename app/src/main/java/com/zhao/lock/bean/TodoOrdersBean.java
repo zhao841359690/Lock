@@ -2,9 +2,10 @@ package com.zhao.lock.bean;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class TodoOrdersBean {
+public class TodoOrdersBean implements Serializable {
     private boolean success;
     private int code;
     private String msg;
@@ -42,7 +43,7 @@ public class TodoOrdersBean {
         this.data = data;
     }
 
-    public static class DataBean {
+    public static class DataBean implements Serializable {
         private String id;
         private String createdBy;
         private String createdDate;

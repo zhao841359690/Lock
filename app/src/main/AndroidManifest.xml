@@ -51,10 +51,16 @@
             android:name=".ui.activity.ScanCodeActivity"
             android:launchMode="singleTask" />
         <activity
-            android:name=".ui.activity.NoTicketActivity"
+            android:name=".ui.activity.BleScanActivity"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.activity.OrdersActivity"
             android:launchMode="singleTask" />
         <activity
             android:name=".ui.activity.NewTicketActivity"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.activity.NoTicketActivity"
             android:launchMode="singleTask" />
         <activity
             android:name=".ui.activity.LockActivity"

@@ -27,4 +27,20 @@ public class SharedPreferencesUtils {
     public String getToken() {
         return mPreferences.getString("token", null);
     }
+
+    public void setUserId(String value) {
+        mPreferences.edit().putString("userId", value).apply();
+    }
+
+    public String getUserId() {
+        return mPreferences.getString("userId", null);
+    }
+
+    public void setUserName(String value) {
+        mPreferences.edit().putString("username", value).apply();
+    }
+
+    public String getUserName() {
+        return mPreferences.getString("username", "我的姓名");
+    }
 }

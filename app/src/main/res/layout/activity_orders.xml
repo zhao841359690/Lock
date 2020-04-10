@@ -4,22 +4,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <include layout="@layout/toolbar" />
+
+    <com.scwang.smartrefresh.layout.SmartRefreshLayout
+        android:id="@+id/smart_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/retry_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:text="无数据\n点击这里重试"
-            android:visibility="gone" />
-
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/ble_scan_rv"
+            android:id="@+id/my_ticket_rv"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-    </RelativeLayout>
+    </com.scwang.smartrefresh.layout.SmartRefreshLayout>
 </LinearLayout>

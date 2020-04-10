@@ -1,6 +1,9 @@
 package com.zhao.lock.core.constant;
 
+import rxhttp.wrapper.annotation.DefaultDomain;
+
 public class Constants {
+    @DefaultDomain //设置为默认域名
     public static final String BASE_URL = "http://61.174.28.14:10072";
 
     /**
@@ -9,14 +12,10 @@ public class Constants {
     public static final int TYPE_HOME_PAGE = 0;
     public static final int TYPE_MINE = 1;
     public static final int TYPE_ABOUT = 2;
-    public static final int TYPE_MY_TICKET = 3;
-    public static final int TYPE_BLE_SCAN = 4;
 
     public static final int SCAN_CODE = 1;
-    public static final int NEW_TICKET = 2;
-    public static final int NO_TICKET = 3;
-    public static final int CASH_DRAWER_NUMBER = 4;
-    public static final int LOCK_BODY_NUMBER = 5;
+    public static final int CASH_DRAWER_NUMBER = 2;
+    public static final int LOCK_BODY_NUMBER = 3;
 
     public static final int OPEN = 0;
     public static final int CLOSE = 1;

@@ -3,7 +3,6 @@ package com.zhao.lock.ui.activity;
 
 import android.Manifest;
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -19,16 +18,14 @@ import com.zhao.lock.R;
 import com.zhao.lock.base.BaseActivity;
 import com.zhao.lock.core.constant.Constants;
 import com.zhao.lock.ui.fragment.AboutFragment;
-import com.zhao.lock.ui.fragment.BleScanFragment;
 import com.zhao.lock.ui.fragment.HomePageFragment;
 import com.zhao.lock.ui.fragment.MineFragment;
-import com.zhao.lock.ui.fragment.MyTicketFragment;
+
 
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class MainActivity extends BaseActivity implements HomePageFragment.OnHomePageFragmentClickListener, MineFragment.OnMineFragmentClickListener, BleScanFragment.OnBleScanFragmentClickListener {
-
+public class MainActivity extends BaseActivity implements HomePageFragment.OnHomePageFragmentClickListener, MineFragment.OnMineFragmentClickListener {
     @BindView(R.id.toolbar)
     LinearLayout toolBar;
     @BindView(R.id.title_tv)
@@ -57,10 +54,6 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
     private HomePageFragment homePageFragment;
     private MineFragment mineFragment;
     private AboutFragment aboutFragment;
-    private MyTicketFragment myTicketFragment;
-    private String myTicketTitle = "我的工单";
-
-    private BleScanFragment bleScanFragment;
 
     private int mLastFgIndex = -1;
 
@@ -83,7 +76,7 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
                 break;
             case R.id.new_ticket_ly:
                 Intent intent = new Intent(this, NewTicketActivity.class);
-                startActivityForResult(intent, Constants.NEW_TICKET);
+                startActivity(intent);
                 break;
             case R.id.mine_ly:
                 showFragment(Constants.TYPE_MINE);
@@ -91,55 +84,32 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Constants.NEW_TICKET && resultCode == Constants.NEW_TICKET) {//新建工单回调
-            myTicketTitle = "我的工单";
-            showFragment(Constants.TYPE_MY_TICKET);
-        } else if (requestCode == Constants.NO_TICKET && resultCode == Constants.NO_TICKET) {//订单为空回调
-            Intent intent = new Intent(this, NewTicketActivity.class);
-            startActivityForResult(intent, Constants.NEW_TICKET);
-        } else if (requestCode == Constants.SCAN_CODE && resultCode == Constants.SCAN_CODE) {//扫码回调
-            if (data != null) {
-                String result = data.getStringExtra("result");
-
-                if ("1".equals(result)) {
-                    myTicketTitle = "MPDTC-XXXXXX的工单";
-                    showFragment(Constants.TYPE_MY_TICKET);
-                } else {
-                    Intent intent = new Intent(this, NoTicketActivity.class);
-                    startActivityForResult(intent, Constants.NO_TICKET);
-                }
-            }
-        }
-    }
-
     //扫码
     @Override
     public void onScanCodeClick() {
         Intent intent = new Intent(this, ScanCodeActivity.class);
-        startActivityForResult(intent, Constants.SCAN_CODE);
+        startActivity(intent);
     }
 
     //Ble扫描
     @Override
     public void onBleScanClick() {
-        showFragment(Constants.TYPE_BLE_SCAN);
+        Intent intent = new Intent(this, BleScanActivity.class);
+        startActivity(intent);
     }
 
     //待操作
     @Override
     public void onPendingClick() {
-        myTicketTitle = "我的工单";
-        showFragment(Constants.TYPE_MY_TICKET);
+        Intent intent = new Intent(this, OrdersActivity.class);
+        startActivity(intent);
     }
 
     //我的工单
     @Override
     public void onMyTicketClick() {
-        myTicketTitle = "我的工单";
-        showFragment(Constants.TYPE_MY_TICKET);
+        Intent intent = new Intent(this, OrdersActivity.class);
+        startActivity(intent);
     }
 
     //关于软件
@@ -152,17 +122,6 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
     @Override
     public void onSignOutClick() {
         finish();
-    }
-
-    @Override
-    public void onAccessClick(int position) {
-        if (position == 0) {
-            Intent intent = new Intent(this, NoTicketActivity.class);
-            startActivityForResult(intent, Constants.NO_TICKET);
-        } else {
-            myTicketTitle = "MPDTC-XXXXXX的工单";
-            showFragment(Constants.TYPE_MY_TICKET);
-        }
     }
 
     private void showFragment(int index) {
@@ -201,25 +160,6 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
                 }
                 transaction.show(aboutFragment);
                 break;
-            case Constants.TYPE_BLE_SCAN:
-                toolBar.setVisibility(View.VISIBLE);
-                titleTv.setText("BLE扫描-结果");
-                if (bleScanFragment == null) {
-                    bleScanFragment = BleScanFragment.newInstance();
-                    transaction.add(R.id.fragment_group, bleScanFragment);
-                }
-                bleScanFragment.setOnBleScanFragmentClickListener(this);
-                transaction.show(bleScanFragment);
-                break;
-            case Constants.TYPE_MY_TICKET:
-                toolBar.setVisibility(View.VISIBLE);
-                titleTv.setText(myTicketTitle);
-                if (myTicketFragment == null) {
-                    myTicketFragment = MyTicketFragment.newInstance();
-                    transaction.add(R.id.fragment_group, myTicketFragment);
-                }
-                transaction.show(myTicketFragment);
-                break;
             default:
                 break;
         }
@@ -244,16 +184,6 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
             case Constants.TYPE_ABOUT:
                 if (aboutFragment != null) {
                     transaction.hide(aboutFragment);
-                }
-                break;
-            case Constants.TYPE_BLE_SCAN:
-                if (bleScanFragment != null) {
-                    transaction.hide(bleScanFragment);
-                }
-                break;
-            case Constants.TYPE_MY_TICKET:
-                if (myTicketFragment != null) {
-                    transaction.hide(myTicketFragment);
                 }
                 break;
             default:

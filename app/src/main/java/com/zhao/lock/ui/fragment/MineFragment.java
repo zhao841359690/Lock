@@ -16,7 +16,6 @@ import butterknife.OnClick;
 import rxhttp.wrapper.param.RxHttp;
 
 public class MineFragment extends BaseFragment {
-
     @BindView(R.id.head_iv)
     ImageView headIv;
     @BindView(R.id.name_tv)
@@ -53,15 +52,7 @@ public class MineFragment extends BaseFragment {
 
     @Override
     protected void initView() {
-        RxHttp.get(Constants.BASE_URL + "/app/userInfo")
-                .add("token", SharedPreferencesUtils.getInstance().getToken())
-                .asClass(UserInfoBean.class)
-                .subscribe(userInfoBean -> {
-                    if (userInfoBean.getCode() == 200) {
-                        nameTv.setText(userInfoBean.getData().getUsername());
-                    }
-                }, throwable -> {
-                });
+        nameTv.setText(SharedPreferencesUtils.getInstance().getUserName());
     }
 
     @OnClick({R.id.my_ticket_tv, R.id.about_rl, R.id.sign_out_tv})

@@ -12,11 +12,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bigkoo.pickerview.TimePickerView;
 import com.zhao.lock.R;
 import com.zhao.lock.base.BaseActivity;
-import com.zhao.lock.bean.UserInfoBean;
+import com.zhao.lock.bean.BaseBean;
 import com.zhao.lock.core.constant.Constants;
 import com.zhao.lock.util.KeyboardUtils;
 import com.zhao.lock.util.SharedPreferencesUtils;
@@ -27,6 +28,7 @@ import java.util.Date;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import rxhttp.wrapper.param.RxHttp;
 
 public class NewTicketActivity extends BaseActivity {
@@ -64,7 +66,6 @@ public class NewTicketActivity extends BaseActivity {
 
     private Intent intent;
     private TimePickerView timePickerView;
-    private AlertDialog.Builder builder;
 
     @Override
     protected int getLayoutId() {
@@ -115,15 +116,26 @@ public class NewTicketActivity extends BaseActivity {
                     String effectTime = startTimeTv.getText().toString().trim();
                     String invalidTime = endTimeTv.getText().toString().trim();
                     String operationType = typeTv.getText().toString().trim();
-                    RxHttp.postForm(Constants.BASE_URL + "/app/workOrder")
-                            .add("token", SharedPreferencesUtils.getInstance().getToken())
+
+                    RxHttp.postJson("/app/workOrder")
+                            .addHeader("token", SharedPreferencesUtils.getInstance().getToken())
                             .add("boxId", boxId)
                             .add("uId", uId)
                             .add("effectTime", effectTime)
                             .add("invalidTime", invalidTime)
-                            .add("operationType", operationType);
-                    setResult(Constants.NEW_TICKET);
-                    finish();
+                            .add("operationType", "开锁".equals(operationType) ? 1 : 2)
+                            .asClass(BaseBean.class)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(baseBean -> {
+                                if (baseBean.getCode() == 200) {
+                                    intent = new Intent(this, OrdersActivity.class);
+                                    startActivity(intent);
+                                } else {
+                                    Toast.makeText(this, baseBean.getMsg(), Toast.LENGTH_SHORT).show();
+                                }
+                            }, throwable -> {
+                                Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
                 }
                 break;
             case R.id.cash_drawer_number_iv:
@@ -144,7 +156,7 @@ public class NewTicketActivity extends BaseActivity {
                 break;
             case R.id.type_ly:
                 final String[] items = {"开锁", "关锁"};
-                builder = new AlertDialog.Builder(this)
+                AlertDialog.Builder builder = new AlertDialog.Builder(this)
                         .setTitle("任务类型")
                         .setItems(items, new DialogInterface.OnClickListener() {
                             @Override

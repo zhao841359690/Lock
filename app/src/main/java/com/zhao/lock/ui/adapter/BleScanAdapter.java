@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.zhao.lock.R;
+import com.zhao.lock.bean.BleBean;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import cn.com.heaton.blelibrary.ble.model.BleDevice;
 
 public class BleScanAdapter extends RecyclerView.Adapter<BleScanAdapter.ViewHolder> {
     private Context context;
-    private List<BleDevice> bleDeviceList;
+    private List<BleBean> bleBeanList;
 
     private OnItemClickListener onItemClickListener;
 
@@ -24,8 +25,9 @@ public class BleScanAdapter extends RecyclerView.Adapter<BleScanAdapter.ViewHold
         this.context = context;
     }
 
-    public void setBleDeviceList(List<BleDevice> bleDeviceList) {
-        this.bleDeviceList = bleDeviceList;
+    public void setBleBeanList(List<BleBean> bleBeanList) {
+        this.bleBeanList = bleBeanList;
+        notifyDataSetChanged();
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
@@ -47,22 +49,22 @@ public class BleScanAdapter extends RecyclerView.Adapter<BleScanAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull BleScanAdapter.ViewHolder viewHolder, int position) {
         final int i = position;
-//        BleDevice bleScanBean = bleDeviceList.get(position);
-//
-//        viewHolder.titleTv.setText(bleScanBean.getBleName());
-//        viewHolder.contentTv.setText(bleScanBean.getBleAddress());
+        BleBean bleBean = bleBeanList.get(position);
+
+        viewHolder.titleTv.setText(bleBean.getBleDevice().getBleName());
+        viewHolder.contentTv.setText(bleBean.getBleDevice().getBleAddress());
+        viewHolder.signalTv.setText(bleBean.getRssi() + "dBm");
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onItemClickListener.onItemClick(i);
+                onItemClickListener.onItemClick(bleBean);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-//        return bleDeviceList == null ? 0 : bleDeviceList.size();
-        return 3;
+        return bleBeanList == null ? 0 : bleBeanList.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -80,6 +82,6 @@ public class BleScanAdapter extends RecyclerView.Adapter<BleScanAdapter.ViewHold
     }
 
     public interface OnItemClickListener {
-        void onItemClick(int position);
+        void onItemClick(BleBean bleBean);
     }
 }

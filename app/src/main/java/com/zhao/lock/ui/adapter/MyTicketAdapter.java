@@ -9,13 +9,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.zhao.lock.R;
-import com.zhao.lock.bean.MyTicketBean;
+import com.zhao.lock.bean.WorkOrdersBean;
 
 import java.util.List;
 
 public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.ViewHolder> {
     private Context context;
-    private List<MyTicketBean> myTicketBeanList;
+    private List<WorkOrdersBean.DataBean.ContentBean> workOrdersBeanList;
 
     private OnItemClickListener onItemClickListener;
 
@@ -23,8 +23,8 @@ public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.ViewHo
         this.context = context;
     }
 
-    public void setMyTicketBeanList(List<MyTicketBean> myTicketBeanList) {
-        this.myTicketBeanList = myTicketBeanList;
+    public void setWorkOrdersBeanList(List<WorkOrdersBean.DataBean.ContentBean> workOrdersBeanList) {
+        this.workOrdersBeanList = workOrdersBeanList;
         notifyDataSetChanged();
     }
 
@@ -46,16 +46,16 @@ public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull MyTicketAdapter.ViewHolder viewHolder, int position) {
-        MyTicketBean myTicketBean = myTicketBeanList.get(position);
+        WorkOrdersBean.DataBean.ContentBean contentBean = workOrdersBeanList.get(position);
 
-        viewHolder.ticketNumberTv.setText("工单编号:" + myTicketBean.getTicNb());
-        viewHolder.pendingTv.setVisibility(myTicketBean.isP() ? View.VISIBLE : View.INVISIBLE);
-        viewHolder.lockBodyNumberTv.setText("锁体编号:" + myTicketBean.getLocNb());
+        viewHolder.ticketNumberTv.setText("工单编号:" + contentBean.getWorkId());
+        viewHolder.pendingTv.setVisibility(contentBean.isEffective() ? View.VISIBLE : View.INVISIBLE);
+        viewHolder.lockBodyNumberTv.setText("锁体编号:" + contentBean.getLock().getUid());
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onItemClickListener.onItemClick();
+                onItemClickListener.onItemClick(contentBean);
             }
         });
 
@@ -63,7 +63,7 @@ public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return myTicketBeanList == null ? 0 : myTicketBeanList.size();
+        return workOrdersBeanList == null ? 0 : workOrdersBeanList.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -81,6 +81,6 @@ public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.ViewHo
     }
 
     public interface OnItemClickListener {
-        void onItemClick();
+        void onItemClick(WorkOrdersBean.DataBean.ContentBean contentBean);
     }
 }

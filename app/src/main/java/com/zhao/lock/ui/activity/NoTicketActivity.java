@@ -1,5 +1,6 @@
 package com.zhao.lock.ui.activity;
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -40,7 +41,8 @@ public class NoTicketActivity extends BaseActivity {
                 finish();
                 break;
             case R.id.new_ticket_ly:
-                setResult(Constants.NO_TICKET);
+                Intent intent = new Intent(this, OrdersActivity.class);
+                startActivity(intent);
                 finish();
                 break;
         }
