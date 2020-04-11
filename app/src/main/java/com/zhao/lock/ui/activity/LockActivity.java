@@ -18,7 +18,7 @@ import com.zhao.lock.bean.TodoOrdersBean;
 import com.zhao.lock.bean.WorkOrderBean;
 import com.zhao.lock.core.constant.Constants;
 import com.zhao.lock.ui.dialog.TipDialog;
-import com.zhao.lock.util.AESUtils;
+import com.zhao.lock.util.BleUtils;
 import com.zhao.lock.util.SharedPreferencesUtils;
 
 import java.util.UUID;
@@ -67,11 +67,11 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            boolean result = mBle.write(mBleDevice, AESUtils.getWrite((byte) 0x01), new BleWriteCallback<BleDevice>() {
+            boolean result = mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), new BleWriteCallback<BleDevice>() {
                 @Override
                 public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
                     if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
-                        AESUtils.getRead(characteristic.getValue());
+                        BleUtils.newInstance().read(characteristic.getValue());
                         Toast.makeText(LockActivity.this, "写入加密数据成功", Toast.LENGTH_SHORT).show();
                     }
                 }

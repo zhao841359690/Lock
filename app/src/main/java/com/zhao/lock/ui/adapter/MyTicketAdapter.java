@@ -45,7 +45,9 @@ public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.ViewHo
 
         viewHolder.ticketNumberTv.setText("工单编号:" + contentBean.getWorkId());
         viewHolder.pendingTv.setVisibility(contentBean.isEffective() ? View.VISIBLE : View.INVISIBLE);
-        viewHolder.lockBodyNumberTv.setText("锁体编号:" + contentBean.getLock().getUid());
+        if (contentBean.getLock() != null) {
+            viewHolder.lockBodyNumberTv.setText("锁体编号:" + contentBean.getLock().getUid());
+        }
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

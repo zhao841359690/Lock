@@ -68,17 +68,17 @@ public class LoginBean {
         }
 
         public static class UserInfoBean {
-            private String userId;
+            private int userId;
             private String username;
             private String gender;
             private String status;
             private String lastLoginTime;
 
-            public String getUserId() {
+            public int getUserId() {
                 return userId;
             }
 
-            public void setUserId(String userId) {
+            public void setUserId(int userId) {
                 this.userId = userId;
             }
 
