@@ -200,8 +200,10 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private BleConnectCallback<BleDevice> connectCallback = new BleConnectCallback<BleDevice>() {
         @Override
         public void onConnectionChanged(BleDevice device) {
-            mBleDevice = device;
-            handler.sendEmptyMessageDelayed(0, 2000);
+            if (device.isConnected()) {
+                mBleDevice = device;
+                handler.sendEmptyMessageDelayed(0, 2000);
+            }
         }
 
         @Override

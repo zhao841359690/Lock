@@ -7,13 +7,10 @@ import android.widget.TextView;
 
 import com.zhao.lock.R;
 import com.zhao.lock.base.BaseFragment;
-import com.zhao.lock.bean.UserInfoBean;
-import com.zhao.lock.core.constant.Constants;
 import com.zhao.lock.util.SharedPreferencesUtils;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import rxhttp.wrapper.param.RxHttp;
 
 public class MineFragment extends BaseFragment {
     @BindView(R.id.head_iv)

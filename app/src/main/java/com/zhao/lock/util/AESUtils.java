@@ -50,10 +50,10 @@ public class AESUtils {
         byte[] bytes = new byte[16];
         bytes[0] = type;
 
-        bytes[1] = 0x01;
-        bytes[2] = 0x01;
-        bytes[3] = 0x01;
-        bytes[4] = 0x01;
+        bytes[1] = 0x00;
+        bytes[2] = 0x00;
+        bytes[3] = 0x00;
+        bytes[4] = 0x00;
 
         if (type == 0x01) {
             bytes[5] = 0x00;
