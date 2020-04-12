@@ -101,9 +101,9 @@ public class BleUtils {
             if (i == 0) {
                 typeByte = bytes1[i];
             } else if (i <= 4) {
-                chkBytes[i] = bytes1[i];
+                chkBytes[i - 1] = bytes1[i];
             } else {
-                dataBytes[i] = bytes1[i];
+                dataBytes[i - 5] = bytes1[i];
             }
         }
         int getChk = DataConvert.byteToInt2(chkBytes);
