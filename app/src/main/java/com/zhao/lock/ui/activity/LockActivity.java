@@ -58,6 +58,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     @BindView(R.id.lock_iv)
     ImageView lockIv;
 
+    private TipDialog tipDialog;
+
     private Ble<BleDevice> mBle;
     private BleDevice mBleDevice;
     private String address;
@@ -72,13 +74,13 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
                     if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
                         BleUtils.newInstance().read(characteristic.getValue());
-                        Toast.makeText(LockActivity.this, "写入加密数据成功", Toast.LENGTH_SHORT).show();
+                        tipDialog.show();
                     }
                 }
             });
 
             if (!result) {
-                Toast.makeText(LockActivity.this, "写入加密数据失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LockActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -146,8 +148,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 break;
             case R.id.lock_ly:
                 mBle.connect(address, connectCallback);
-//                TipDialog tipDialog = new TipDialog(this, this);
-//                tipDialog.show();
+                tipDialog = new TipDialog(this, this);
                 break;
         }
     }
