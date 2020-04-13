@@ -3,28 +3,6 @@ package com.zhao.lock.util;
 public class DataConvert {
     /**
      * 将int类型的数据转换为byte数组
-     *
-     * @param n int数据
-     * @return 生成的byte数组
-     */
-    public static byte[] intToBytes(int n) {
-        String s = String.valueOf(n);
-        return s.getBytes();
-    }
-
-    /**
-     * 将byte数组转换为int数据
-     *
-     * @param b 字节数组
-     * @return 生成的int数据
-     */
-    public static int bytesToInt(byte[] b) {
-        String s = new String(b);
-        return Integer.parseInt(s);
-    }
-
-    /**
-     * 将int类型的数据转换为byte数组
      * 原理：将int数据中的四个byte取出，分别存储
      *
      * @param n int数据
