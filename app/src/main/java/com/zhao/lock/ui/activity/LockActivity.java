@@ -97,6 +97,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         titleLeftIv.setVisibility(View.VISIBLE);
         titleLineView.setVisibility(View.GONE);
 
+        tipDialog = new TipDialog(this, this);
+
         boolean showLock = getIntent().getBooleanExtra("showLock", false);
         if (showLock) {
             lockLy.setVisibility(View.VISIBLE);
@@ -116,7 +118,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                     cabinetNumber.setText("箱体编号：" + workOrderBean.getData().getBoxId());
                     timeTv.setText(workOrderBean.getData().getEffectTime() + " - " + workOrderBean.getData().getInvalidTime());
                     typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>" + ("0".equals(workOrderBean.getData().getLock().getArchStatus()) ? "关锁" : "开锁") + "</font>"));
+                    tipDialog.setOpenOrClose("0".equals(workOrderBean.getData().getLock().getArchStatus()) ? "关锁" : "开锁");
                 }, throwable -> {
+                    Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
                 });
         RxHttp.get("/app/todoOrders")
                 .add("token", SharedPreferencesUtils.getInstance().getToken())
@@ -148,7 +152,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 break;
             case R.id.lock_ly:
                 mBle.connect(address, connectCallback);
-                tipDialog = new TipDialog(this, this);
                 break;
         }
     }

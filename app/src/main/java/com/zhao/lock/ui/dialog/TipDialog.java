@@ -28,6 +28,10 @@ public class TipDialog extends Dialog implements View.OnClickListener {
         this.onTipDialogClickListener = onTargetDiaLogCyclesListener;
     }
 
+    public void setOpenOrClose(String openOrClose) {
+        openCloseTv.setText(openOrClose);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,7 +48,7 @@ public class TipDialog extends Dialog implements View.OnClickListener {
         contentTv.setText(Html.fromHtml("编号:<font color='#0E5EAB'>ADC123456</font>锁体已连接,<br/>请确认开锁!"));
 
         openCloseTv = findViewById(R.id.open_close_tv);
-        openCloseTv.setText("开锁");
+
         openCloseTv.setOnClickListener(this);
         cancelTv = findViewById(R.id.cancel_tv);
         cancelTv.setOnClickListener(this);
