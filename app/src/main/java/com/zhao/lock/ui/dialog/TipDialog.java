@@ -20,6 +20,8 @@ public class TipDialog extends Dialog implements View.OnClickListener {
     private TextView openCloseTv;
     private TextView cancelTv;
 
+    private boolean isOpen;
+
     private OnTipDialogClickListener onTipDialogClickListener;
 
 
@@ -29,7 +31,11 @@ public class TipDialog extends Dialog implements View.OnClickListener {
     }
 
     public void setOpenOrClose(String openOrClose) {
+        isOpen = "开锁".equals(openOrClose);
+        titleTv.setText(openOrClose + "提醒");
         openCloseTv.setText(openOrClose);
+        contentTv.setText(Html.fromHtml("编号:<font color='#0E5EAB'>ADC123456</font>锁体已连接,<br/>请确认" + openOrClose + "!"));
+
     }
 
     @Override
@@ -39,13 +45,11 @@ public class TipDialog extends Dialog implements View.OnClickListener {
         setCanceledOnTouchOutside(false);
 
         titleTv = findViewById(R.id.title_tv);
-        titleTv.setText("开锁提醒");
 
         lockIv = findViewById(R.id.lock_iv);
         lockIv.setImageResource(R.drawable.open_lock_icon);
 
         contentTv = findViewById(R.id.content_tv);
-        contentTv.setText(Html.fromHtml("编号:<font color='#0E5EAB'>ADC123456</font>锁体已连接,<br/>请确认开锁!"));
 
         openCloseTv = findViewById(R.id.open_close_tv);
 
@@ -58,7 +62,7 @@ public class TipDialog extends Dialog implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.open_close_tv:
-                onTipDialogClickListener.onOpenCloseClick(Constants.OPEN);
+                onTipDialogClickListener.onOpenCloseClick(isOpen ? Constants.OPEN : Constants.CLOSE);
                 break;
             case R.id.cancel_tv:
                 dismiss();

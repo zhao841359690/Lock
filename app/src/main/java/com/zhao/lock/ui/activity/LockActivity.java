@@ -163,25 +163,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         }
 
         if (type == Constants.OPEN) {
-            boolean result = mBle.write(mBleDevice, "open".getBytes(), new BleWriteCallback<BleDevice>() {
-                @Override
-                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                    Toast.makeText(LockActivity.this, "解锁成功", Toast.LENGTH_SHORT).show();
-                }
-            });
-            if (!result) {
-                Toast.makeText(LockActivity.this, "解锁失败", Toast.LENGTH_SHORT).show();
-            }
+
         } else if (type == Constants.CLOSE) {
-            boolean result = mBle.write(mBleDevice, "close".getBytes(), new BleWriteCallback<BleDevice>() {
-                @Override
-                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                    Toast.makeText(LockActivity.this, "锁定成功", Toast.LENGTH_SHORT).show();
-                }
-            });
-            if (!result) {
-                Toast.makeText(LockActivity.this, "锁定失败", Toast.LENGTH_SHORT).show();
-            }
+
         }
     }
 
