@@ -1,6 +1,7 @@
 package com.zhao.lock.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.Handler;
 import android.os.Message;
@@ -65,6 +66,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     ImageView lockIv;
 
     private TipDialog tipDialog;
+    private ProgressDialog progressDialog;
 
     private Ble<BleDevice> mBle;
     private BleDevice mBleDevice;
@@ -78,6 +80,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
             boolean result = mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), new BleWriteCallback<BleDevice>() {
                 @Override
                 public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                    progressDialog.dismiss();
                     if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
                         BleUtils.newInstance().read(characteristic.getValue());
                         tipDialog.show();
@@ -86,6 +89,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
             });
 
             if (!result) {
+                progressDialog.dismiss();
                 Toast.makeText(LockActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
             }
         }
@@ -106,6 +110,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         titleLineView.setVisibility(View.GONE);
 
         tipDialog = new TipDialog(this, this);
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCanceledOnTouchOutside(false);
 
         boolean showLock = getIntent().getBooleanExtra("showLock", false);
         if (showLock) {
@@ -160,6 +166,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 finish();
                 break;
             case R.id.lock_ly:
+                progressDialog.setMessage("蓝牙连接中...");
+                progressDialog.show();
                 mBle.connect(address, connectCallback);
                 break;
         }
@@ -220,12 +228,14 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void onConnectException(BleDevice device, int errorCode) {
             super.onConnectException(device, errorCode);
+            progressDialog.dismiss();
             Toast.makeText(LockActivity.this, "连接异常，异常状态码:" + errorCode, Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onConnectTimeOut(BleDevice device) {
             super.onConnectTimeOut(device);
+            progressDialog.dismiss();
             Toast.makeText(LockActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
         }
     };
