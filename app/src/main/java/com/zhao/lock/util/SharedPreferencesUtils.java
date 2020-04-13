@@ -28,12 +28,12 @@ public class SharedPreferencesUtils {
         return mPreferences.getString("token", null);
     }
 
-    public void setUserId(int value) {
-        mPreferences.edit().putInt("userId", value).apply();
+    public void setUserId(String value) {
+        mPreferences.edit().putString("userId", value).apply();
     }
 
-    public int getUserId() {
-        return mPreferences.getInt("userId", 0);
+    public String getUserId() {
+        return mPreferences.getString("userId", null);
     }
 
     public void setUserName(String value) {

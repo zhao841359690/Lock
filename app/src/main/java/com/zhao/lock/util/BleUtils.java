@@ -20,7 +20,7 @@ public class BleUtils {
         for (int i = 0; i < chkBytes.length; i++) {
             bytes[i + 1] = chkBytes[i];
         }
-        byte[] userIdBytes = DataConvert.intToBytes2(SharedPreferencesUtils.getInstance().getUserId());
+        byte[] userIdBytes =SharedPreferencesUtils.getInstance().getUserId().getBytes();
         for (int i = 0; i < userIdBytes.length; i++) {
             bytes[i + 5] = userIdBytes[i];
         }

@@ -15,18 +15,20 @@ public class SocketUtils {
         byte[] writeLockNormalBytes = new byte[22];
         writeLockNormalBytes[0] = 0x7e;
         writeLockNormalBytes[1] = 0x02;//负载分包数
-        byte[] lockBytes = DataConvert.intToBytes2(lockId);
-        for (int i = 0; i < lockBytes.length; i++) {
-            writeLockNormalBytes[i + 2] = lockBytes[i];//设备Id
-        }
+        writeLockNormalBytes[2] = 0x01;//设备Id
+        writeLockNormalBytes[3] = 0x02;
+        writeLockNormalBytes[4] = 0x03;
+        writeLockNormalBytes[5] = 0x04;
 
         //数据载荷的内容需要加密
         byte[] dataBytes = new byte[16];
         dataBytes[0] = 0x06;
         dataBytes[1] = (byte) 0xfe;
-        for (int i = 0; i < lockBytes.length; i++) {
-            writeLockNormalBytes[i + 2] = lockBytes[i];//设备号
-        }
+        dataBytes[2] = 0x01;//设备Id
+        dataBytes[3] = 0x02;
+        dataBytes[4] = 0x03;
+        dataBytes[5] = 0x04;
+        byte[] lockBytes = DataConvert.intToBytes2(lockId);
         dataBytes[6] = 0x54;//长度(锁号+用户id的总长度再+2)
         if (open) {//开锁
             dataBytes[7] = (byte) 0xe1;
@@ -36,7 +38,7 @@ public class SocketUtils {
         for (int i = 0; i < lockBytes.length; i++) {
             writeLockNormalBytes[i + 8] = lockBytes[i];//锁号
         }
-        byte[] userIdBytes = DataConvert.intToBytes2(SharedPreferencesUtils.getInstance().getUserId());
+        byte[] userIdBytes = SharedPreferencesUtils.getInstance().getUserId().getBytes();
         for (int i = 0; i < userIdBytes.length; i++) {
             dataBytes[i + 12] = userIdBytes[i];//用户Id
         }
