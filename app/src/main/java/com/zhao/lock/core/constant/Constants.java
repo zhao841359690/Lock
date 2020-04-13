@@ -5,6 +5,8 @@ import rxhttp.wrapper.annotation.DefaultDomain;
 public class Constants {
     @DefaultDomain //设置为默认域名
     public static final String BASE_URL = "http://61.174.28.14:10072";
+    public static final String IP = "61.174.28.14";
+    public static final int PORT = 10072;
 
     /**
      * Tag fragment

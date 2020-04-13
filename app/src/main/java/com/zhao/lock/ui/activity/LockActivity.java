@@ -12,6 +12,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.easysocket.EasySocket;
+import com.easysocket.config.EasySocketOptions;
+import com.easysocket.entity.OriginReadData;
+import com.easysocket.entity.SocketAddress;
+import com.easysocket.interfaces.conn.ISocketActionListener;
+import com.easysocket.interfaces.conn.SocketActionListener;
 import com.zhao.lock.R;
 import com.zhao.lock.base.BaseActivity;
 import com.zhao.lock.bean.TodoOrdersBean;
@@ -93,6 +99,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     @Override
     protected void initView() {
         initBle();
+        initSocket();
+
 
         titleLeftIv.setVisibility(View.VISIBLE);
         titleLineView.setVisibility(View.GONE);
@@ -186,6 +194,20 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 .create(this);
     }
 
+    private void initSocket() {
+        //socket配置
+        EasySocketOptions options = new EasySocketOptions.Builder()
+                .setSocketAddress(new SocketAddress(Constants.IP, Constants.PORT)) //主机地址
+                .build();
+
+        //初始化EasySocket
+        EasySocket.getInstance()
+                .options(options) //项目配置
+                .buildConnection();//创建一个socket连接
+
+        EasySocket.getInstance().subscribeSocketAction(socketActionListener);
+    }
+
     private BleConnectCallback<BleDevice> connectCallback = new BleConnectCallback<BleDevice>() {
         @Override
         public void onConnectionChanged(BleDevice device) {
@@ -205,6 +227,34 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         public void onConnectTimeOut(BleDevice device) {
             super.onConnectTimeOut(device);
             Toast.makeText(LockActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private ISocketActionListener socketActionListener = new SocketActionListener() {
+        @Override
+        public void onSocketConnSuccess(SocketAddress socketAddress) {
+            super.onSocketConnSuccess(socketAddress);
+        }
+
+        @Override
+        public void onSocketConnFail(SocketAddress socketAddress, Boolean isNeedReconnect) {
+            super.onSocketConnFail(socketAddress, isNeedReconnect);
+            if (tipDialog != null) {
+                tipDialog.dismiss();
+            }
+        }
+
+        @Override
+        public void onSocketDisconnect(SocketAddress socketAddress, Boolean isNeedReconnect) {
+            super.onSocketDisconnect(socketAddress, isNeedReconnect);
+            if (tipDialog != null) {
+                tipDialog.dismiss();
+            }
+        }
+
+        @Override
+        public void onSocketResponse(SocketAddress socketAddress, OriginReadData originReadData) {
+            super.onSocketResponse(socketAddress, originReadData);
         }
     };
 }
