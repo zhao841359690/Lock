@@ -20,7 +20,7 @@ public class TipDialog extends Dialog implements View.OnClickListener {
     private TextView openCloseTv;
     private TextView cancelTv;
 
-    private boolean isOpen;
+    private boolean openOrClose;
 
     private OnTipDialogClickListener onTipDialogClickListener;
 
@@ -30,12 +30,8 @@ public class TipDialog extends Dialog implements View.OnClickListener {
         this.onTipDialogClickListener = onTargetDiaLogCyclesListener;
     }
 
-    public void setOpenOrClose(String openOrClose) {
-        isOpen = "开锁".equals(openOrClose);
-        titleTv.setText(openOrClose + "提醒");
-        openCloseTv.setText(openOrClose);
-        contentTv.setText(Html.fromHtml("编号:<font color='#0E5EAB'>ADC123456</font>锁体已连接,<br/>请确认" + openOrClose + "!"));
-
+    public void setOpenOrClose(boolean openOrClose) {
+        this.openOrClose = openOrClose;
     }
 
     @Override
@@ -45,6 +41,7 @@ public class TipDialog extends Dialog implements View.OnClickListener {
         setCanceledOnTouchOutside(false);
 
         titleTv = findViewById(R.id.title_tv);
+        titleTv.setText(openOrClose ? "开锁" : "关锁" + "提醒");
 
         lockIv = findViewById(R.id.lock_iv);
         lockIv.setImageResource(R.drawable.open_lock_icon);
@@ -52,17 +49,20 @@ public class TipDialog extends Dialog implements View.OnClickListener {
         contentTv = findViewById(R.id.content_tv);
 
         openCloseTv = findViewById(R.id.open_close_tv);
+        openCloseTv.setText(openOrClose ? "开锁" : "关锁");
 
         openCloseTv.setOnClickListener(this);
         cancelTv = findViewById(R.id.cancel_tv);
         cancelTv.setOnClickListener(this);
+
+        contentTv.setText(Html.fromHtml("编号:<font color='#0E5EAB'>ADC123456</font>锁体已连接,<br/>请确认" + (openOrClose ? "开锁" : "关锁") + "!"));
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.open_close_tv:
-                onTipDialogClickListener.onOpenCloseClick(isOpen ? Constants.OPEN : Constants.CLOSE);
+                onTipDialogClickListener.onOpenCloseClick(openOrClose ? Constants.OPEN : Constants.CLOSE);
                 break;
             case R.id.cancel_tv:
                 dismiss();

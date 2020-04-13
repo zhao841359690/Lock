@@ -118,9 +118,10 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                     cabinetNumber.setText("箱体编号：" + workOrderBean.getData().getBoxId());
                     timeTv.setText(workOrderBean.getData().getEffectTime() + " - " + workOrderBean.getData().getInvalidTime());
                     typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>" + ("0".equals(workOrderBean.getData().getLock().getArchStatus()) ? "关锁" : "开锁") + "</font>"));
-                    tipDialog.setOpenOrClose("0".equals(workOrderBean.getData().getLock().getArchStatus()) ? "关锁" : "开锁");
+                    tipDialog.setOpenOrClose("1".equals(workOrderBean.getData().getLock().getArchStatus()));
                 }, throwable -> {
                     Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    finish();
                 });
         RxHttp.get("/app/todoOrders")
                 .add("token", SharedPreferencesUtils.getInstance().getToken())
