@@ -29,7 +29,7 @@ public class SocketUtils {
         dataBytes[4] = 0x03;
         dataBytes[5] = 0x04;
         byte[] lockBytes = DataConvert.intToBytes2(lockId);
-        dataBytes[6] = 0x54;//长度(锁号+用户id的总长度再+2)
+        dataBytes[6] = 0x10;//长度(锁号+用户id的总长度再+2)
         if (open) {//开锁
             dataBytes[7] = (byte) 0xe1;
         } else {//关锁
