@@ -13,12 +13,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.easysocket.EasySocket;
-import com.easysocket.config.EasySocketOptions;
-import com.easysocket.entity.OriginReadData;
-import com.easysocket.entity.SocketAddress;
-import com.easysocket.interfaces.conn.ISocketActionListener;
-import com.easysocket.interfaces.conn.SocketActionListener;
 import com.zhao.lock.R;
 import com.zhao.lock.base.BaseActivity;
 import com.zhao.lock.bean.TodoOrdersBean;
@@ -28,7 +22,13 @@ import com.zhao.lock.ui.dialog.TipDialog;
 import com.zhao.lock.util.BleUtils;
 import com.zhao.lock.util.SharedPreferencesUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -72,6 +72,11 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private BleDevice mBleDevice;
     private String address;
 
+    private ExecutorService mThreadPool;
+    private Socket socket;
+    private OutputStream outputStream;
+    private InputStream inputStream;
+
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
@@ -104,7 +109,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     protected void initView() {
         initBle();
         initSocket();
-
 
         titleLeftIv.setVisibility(View.VISIBLE);
         titleLineView.setVisibility(View.GONE);
@@ -157,6 +161,13 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     protected void onDestroy() {
         super.onDestroy();
         mBle.destory(this);
+        try {
+            outputStream.close();
+            inputStream.close();
+            socket.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @OnClick({R.id.title_left_rl, R.id.lock_ly})
@@ -180,7 +191,52 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         }
 
         if (type == Constants.OPEN) {
+            mThreadPool.execute(() -> {
+                try {
+                    outputStream = socket.getOutputStream();
+                    byte[] bytes = new byte[24];
+                    bytes[0] = 0x7e;
 
+                    bytes[1] = 0x02;
+
+                    bytes[2] = 0x01;
+                    bytes[3] = 0x02;
+                    bytes[4] = 0x03;
+                    bytes[5] = 0x04;
+
+                    bytes[6] = 0x74;
+                    bytes[7] = 0x44;
+                    bytes[8] = (byte) 0xdd;
+                    bytes[9] = 0x6a;
+                    bytes[10] = (byte) 0x91;
+                    bytes[11] = 0x73;
+                    bytes[12] = 0x54;
+                    bytes[13] = (byte) 0xfc;
+                    bytes[14] = 0x59;
+                    bytes[15] = (byte) 0xd9;
+                    bytes[16] = 0x76;
+                    bytes[17] = 0x30;
+                    bytes[18] = 0x4c;
+                    bytes[19] = 0x1c;
+
+                    bytes[20] = 0x73;
+                    bytes[21] = (byte) 0xa7;
+                    bytes[22] = 0x23;
+                    bytes[23] = (byte) 0xf5;
+
+                    outputStream.write(bytes);
+                    outputStream.flush();
+
+                    inputStream = socket.getInputStream();
+                    byte[] data = new byte[24];
+                    int read = inputStream.read(data);
+                    if (read != -1) {
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         } else if (type == Constants.CLOSE) {
 
         }
@@ -203,17 +259,16 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     }
 
     private void initSocket() {
+        //初始化线程池
+        mThreadPool = Executors.newCachedThreadPool();
         //socket配置
-        EasySocketOptions options = new EasySocketOptions.Builder()
-                .setSocketAddress(new SocketAddress(Constants.IP, Constants.PORT)) //主机地址
-                .build();
-
-        //初始化EasySocket
-        EasySocket.getInstance()
-                .options(options) //项目配置
-                .buildConnection();//创建一个socket连接
-
-        EasySocket.getInstance().subscribeSocketAction(socketActionListener);
+        mThreadPool.execute(() -> {
+            try {
+                socket = new Socket(Constants.IP, Constants.PORT);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private BleConnectCallback<BleDevice> connectCallback = new BleConnectCallback<BleDevice>() {
@@ -240,31 +295,19 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         }
     };
 
-    private ISocketActionListener socketActionListener = new SocketActionListener() {
-        @Override
-        public void onSocketConnSuccess(SocketAddress socketAddress) {
-            super.onSocketConnSuccess(socketAddress);
-        }
+    private String str2HexStr(String str) {
+        char[] chars = "0123456789ABCDEF".toCharArray();
+        StringBuilder sb = new StringBuilder("");
+        byte[] bs = str.getBytes();
+        int bit;
 
-        @Override
-        public void onSocketConnFail(SocketAddress socketAddress, Boolean isNeedReconnect) {
-            super.onSocketConnFail(socketAddress, isNeedReconnect);
-            if (tipDialog != null) {
-                tipDialog.dismiss();
-            }
+        for (int i = 0; i < bs.length; i++) {
+            bit = (bs[i] & 0x0f0) >> 4;
+            sb.append(chars[bit]);
+            bit = bs[i] & 0x0f;
+            sb.append(chars[bit]);
+            sb.append(' ');
         }
-
-        @Override
-        public void onSocketDisconnect(SocketAddress socketAddress, Boolean isNeedReconnect) {
-            super.onSocketDisconnect(socketAddress, isNeedReconnect);
-            if (tipDialog != null) {
-                tipDialog.dismiss();
-            }
-        }
-
-        @Override
-        public void onSocketResponse(SocketAddress socketAddress, OriginReadData originReadData) {
-            super.onSocketResponse(socketAddress, originReadData);
-        }
-    };
+        return sb.toString().trim();
+    }
 }
