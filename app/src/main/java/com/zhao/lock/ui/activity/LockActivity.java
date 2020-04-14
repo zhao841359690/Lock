@@ -16,16 +16,21 @@ import android.widget.Toast;
 import com.zhao.lock.R;
 import com.zhao.lock.base.BaseActivity;
 import com.zhao.lock.bean.TodoOrdersBean;
+import com.zhao.lock.bean.TypeBean;
 import com.zhao.lock.bean.WorkOrderBean;
 import com.zhao.lock.core.constant.Constants;
 import com.zhao.lock.ui.dialog.TipDialog;
 import com.zhao.lock.util.BleUtils;
 import com.zhao.lock.util.SharedPreferencesUtils;
+import com.zhao.lock.util.SocketUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -34,6 +39,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import cn.com.heaton.blelibrary.ble.Ble;
 import cn.com.heaton.blelibrary.ble.callback.BleConnectCallback;
+import cn.com.heaton.blelibrary.ble.callback.BleNotiftCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
 import cn.com.heaton.blelibrary.ble.model.BleDevice;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -77,6 +83,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private OutputStream outputStream;
     private InputStream inputStream;
 
+    private List<byte[]> write06 = new ArrayList<>();
+
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
@@ -85,10 +93,14 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
             boolean result = mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), new BleWriteCallback<BleDevice>() {
                 @Override
                 public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                    progressDialog.dismiss();
                     if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
                         BleUtils.newInstance().read(characteristic.getValue());
+                        progressDialog.dismiss();
                         tipDialog.show();
+                        mBle.startNotify(mBleDevice, bleNotiftCallback);
+                    } else {
+                        progressDialog.dismiss();
+                        Toast.makeText(LockActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -191,54 +203,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         }
 
         if (type == Constants.OPEN) {
-            mThreadPool.execute(() -> {
-                try {
-                    outputStream = socket.getOutputStream();
-                    byte[] bytes = new byte[24];
-                    bytes[0] = 0x7e;
-
-                    bytes[1] = 0x02;
-
-                    bytes[2] = 0x01;
-                    bytes[3] = 0x02;
-                    bytes[4] = 0x03;
-                    bytes[5] = 0x04;
-
-                    bytes[6] = 0x74;
-                    bytes[7] = 0x44;
-                    bytes[8] = (byte) 0xdd;
-                    bytes[9] = 0x6a;
-                    bytes[10] = (byte) 0x91;
-                    bytes[11] = 0x73;
-                    bytes[12] = 0x54;
-                    bytes[13] = (byte) 0xfc;
-                    bytes[14] = 0x59;
-                    bytes[15] = (byte) 0xd9;
-                    bytes[16] = 0x76;
-                    bytes[17] = 0x30;
-                    bytes[18] = 0x4c;
-                    bytes[19] = 0x1c;
-
-                    bytes[20] = 0x73;
-                    bytes[21] = (byte) 0xa7;
-                    bytes[22] = 0x23;
-                    bytes[23] = (byte) 0xf5;
-
-                    outputStream.write(bytes);
-                    outputStream.flush();
-
-                    inputStream = socket.getInputStream();
-                    byte[] data = new byte[24];
-                    int read = inputStream.read(data);
-                    if (read != -1) {
-
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+            openOrClose(true);
         } else if (type == Constants.CLOSE) {
-
+            openOrClose(false);
         }
     }
 
@@ -295,19 +262,136 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         }
     };
 
-    private String str2HexStr(String str) {
-        char[] chars = "0123456789ABCDEF".toCharArray();
-        StringBuilder sb = new StringBuilder("");
-        byte[] bs = str.getBytes();
-        int bit;
+    private BleNotiftCallback bleNotiftCallback = new BleNotiftCallback() {
+        @Override
+        public void onChanged(Object device, BluetoothGattCharacteristic characteristic) {
+            if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
+                TypeBean typeBean = BleUtils.newInstance().read(characteristic.getValue());
+                if (typeBean != null) {
+                    if (Constants.READ_4 == typeBean.getType()) {
+                        if (typeBean.getLockType() == Constants.Lock0 || typeBean.getLockType() == Constants.Lock3) {
+                            if (tipDialog != null) {
+                                tipDialog.dismiss();
+                            }
+                        }
+                    } else if (Constants.READ_6 == typeBean.getType()) {
+                        write06.add(typeBean.getData());
+                        if (typeBean.isOk()) {
+                            byte[] data = new byte[write06.size() * 10];
+                            int size = 0;
+                            for (byte[] bytes : write06) {
+                                for (int i = 0; i < bytes.length; i++) {
+                                    data[size + i] = bytes[i];
+                                }
+                                size += bytes.length;
+                            }
+                            byte[] sendData = SocketUtils.write06(data);
+                            write06 = new ArrayList<>();
+                            mThreadPool.execute(() -> {
+                                try {
+                                    outputStream = socket.getOutputStream();
 
-        for (int i = 0; i < bs.length; i++) {
-            bit = (bs[i] & 0x0f0) >> 4;
-            sb.append(chars[bit]);
-            bit = bs[i] & 0x0f;
-            sb.append(chars[bit]);
-            sb.append(' ');
+                                    outputStream.write(sendData);
+                                    outputStream.flush();
+
+                                    inputStream = socket.getInputStream();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            });
+                        }
+                    }
+                }
+            }
         }
-        return sb.toString().trim();
+    };
+
+    private void openOrClose(boolean openOrClose) {
+        progressDialog.setMessage(openOrClose ? "开锁中..." : "关锁中...");
+        progressDialog.show();
+
+        mThreadPool.execute(() -> {
+            try {
+                outputStream = socket.getOutputStream();
+                byte[] bytes = new byte[24];
+                bytes[0] = 0x7e;
+
+                bytes[1] = 0x02;
+
+                bytes[2] = 0x01;
+                bytes[3] = 0x02;
+                bytes[4] = 0x03;
+                bytes[5] = 0x04;
+
+                bytes[6] = 0x74;
+                bytes[7] = 0x44;
+                bytes[8] = (byte) 0xdd;
+                bytes[9] = 0x6a;
+                bytes[10] = (byte) 0x91;
+                bytes[11] = 0x73;
+                bytes[12] = 0x54;
+                bytes[13] = (byte) 0xfc;
+                bytes[14] = 0x59;
+                bytes[15] = (byte) 0xd9;
+                bytes[16] = 0x76;
+                bytes[17] = 0x30;
+                bytes[18] = 0x4c;
+                bytes[19] = 0x1c;
+
+                bytes[20] = 0x73;
+                bytes[21] = (byte) 0xa7;
+                bytes[22] = 0x23;
+                bytes[23] = (byte) 0xf5;
+
+                outputStream.write(bytes);
+                outputStream.flush();
+
+                inputStream = socket.getInputStream();
+                byte[] head = new byte[2];
+                int readHead = inputStream.read(head);
+                if (readHead != -1) {
+                    int total = 22 + (head[1] - 1) * 16;
+                    byte[] elseData = new byte[total];
+                    int read = inputStream.read(elseData);
+                    byte[] data = new byte[total + 2];
+                    for (int i = 0; i < data.length; i++) {
+                        if (i < 2) {
+                            data[i] = head[i];
+                        } else {
+                            data[i] = elseData[i - 2];
+                        }
+                    }
+                    if (read != -1 || Arrays.equals(data, Constants.ERROR)) {
+                        List<byte[]> encDataList = BleUtils.newInstance().write05(data);
+                        for (byte[] bytes1 : encDataList) {
+                            boolean result = mBle.write(mBleDevice, bytes1, new BleWriteCallback<BleDevice>() {
+                                @Override
+                                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                                    if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
+                                        BleUtils.newInstance().read(characteristic.getValue());
+                                    }
+                                }
+                            });
+                            if (!result) {
+                                progressDialog.dismiss();
+                            }
+                        }
+                    } else {
+                        progressDialog.dismiss();
+                        tipDialog.dismiss();
+                        Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    progressDialog.dismiss();
+                    tipDialog.dismiss();
+                    Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_SHORT).show();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                progressDialog.dismiss();
+                tipDialog.dismiss();
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
