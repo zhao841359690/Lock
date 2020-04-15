@@ -39,7 +39,6 @@
         android:hint="手机号"
         android:inputType="phone"
         android:padding="10dp"
-        android:text="0000"
         android:textColor="#c5c5c5"
         android:textSize="14sp" />
 
@@ -56,7 +55,6 @@
         android:hint="请输入密码"
         android:inputType="textPassword"
         android:padding="5dp"
-        android:text="000000"
         android:textSize="14sp" />
 
     <LinearLayout

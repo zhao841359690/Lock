@@ -9,6 +9,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.qw.soul.permission.SoulPermission;
 import com.qw.soul.permission.bean.Permission;
@@ -87,8 +88,9 @@ public class MainActivity extends BaseActivity implements HomePageFragment.OnHom
     //扫码
     @Override
     public void onScanCodeClick() {
-        Intent intent = new Intent(this, ScanCodeActivity.class);
-        startActivity(intent);
+        Toast.makeText(this, "暂无此功能", Toast.LENGTH_SHORT).show();
+//        Intent intent = new Intent(this, ScanCodeActivity.class);
+//        startActivity(intent);
     }
 
     //Ble扫描
