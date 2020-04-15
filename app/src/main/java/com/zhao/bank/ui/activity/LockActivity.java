@@ -77,6 +77,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private Ble<BleDevice> mBle;
     private BleDevice mBleDevice;
     private String address;
+    private int uid;
 
     private ExecutorService mThreadPool;
     private Socket socket;
@@ -142,9 +143,10 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(workOrderBean -> {
                     address = workOrderBean.getData().getLock().getBleMac();
+                    uid = workOrderBean.getData().getLock().getUid();
 
                     ticketNumberTv.setText("工单编号：" + workOrderBean.getData().getWorkId());
-                    lockBodyNumberTv.setText("锁体编号：" + workOrderBean.getData().getLock().getUid());
+                    lockBodyNumberTv.setText("锁体编号：" + uid);
                     cabinetNumber.setText("箱体编号：" + workOrderBean.getData().getBoxId());
                     timeTv.setText(workOrderBean.getData().getEffectTime() + " - " + workOrderBean.getData().getInvalidTime());
                     typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>" + ("0".equals(workOrderBean.getData().getLock().getArchStatus()) ? "关锁" : "开锁") + "</font>"));
@@ -313,37 +315,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         mThreadPool.execute(() -> {
             try {
                 outputStream = socket.getOutputStream();
-                byte[] bytes = new byte[24];
-                bytes[0] = 0x7e;
 
-                bytes[1] = 0x02;
-
-                bytes[2] = 0x01;
-                bytes[3] = 0x02;
-                bytes[4] = 0x03;
-                bytes[5] = 0x04;
-
-                bytes[6] = 0x74;
-                bytes[7] = 0x44;
-                bytes[8] = (byte) 0xdd;
-                bytes[9] = 0x6a;
-                bytes[10] = (byte) 0x91;
-                bytes[11] = 0x73;
-                bytes[12] = 0x54;
-                bytes[13] = (byte) 0xfc;
-                bytes[14] = 0x59;
-                bytes[15] = (byte) 0xd9;
-                bytes[16] = 0x76;
-                bytes[17] = 0x30;
-                bytes[18] = 0x4c;
-                bytes[19] = 0x1c;
-
-                bytes[20] = 0x73;
-                bytes[21] = (byte) 0xa7;
-                bytes[22] = 0x23;
-                bytes[23] = (byte) 0xf5;
-
-                outputStream.write(bytes);
+                outputStream.write(SocketUtils.writeLock(uid, openOrClose));
                 outputStream.flush();
 
                 inputStream = socket.getInputStream();
