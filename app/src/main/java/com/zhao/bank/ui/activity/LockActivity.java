@@ -220,10 +220,10 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 .setConnectFailedRetryCount(3)
                 .setConnectTimeout(10 * 1000)//设置连接超时时长（默认10*1000 ms）
                 .setScanPeriod(12 * 1000)//设置扫描时长（默认10*1000 ms）
-                .setUuidService(UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e"))//主服务的uuid
-                .setUuidWriteCha(UUID.fromString("6e400002-b5a3-f393-e0a9-e50e24dcca9e"))//可写特征的uuid
-                .setUuidReadCha(UUID.fromString("6e400003-b5a3-f393-e0a9-e50e24dcca9e"))//可读特征的uuid
-                .setUuidNotify(UUID.fromString("6e400001-b5a3-f393-e0a9-e50e24dcca9e"))
+                .setUuidService(UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb"))//主服务的uuid
+                .setUuidWriteCha(UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb"))//可写特征的uuid
+                .setUuidReadCha(UUID.fromString("0000ffe2-0000-1000-8000-00805f9b34fb"))//可读特征的uuid
+                .setUuidNotify(UUID.fromString("0000ffe2-0000-1000-8000-00805f9b34fb"))
                 .create(this);
     }
 
