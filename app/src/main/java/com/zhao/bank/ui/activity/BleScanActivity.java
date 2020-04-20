@@ -109,7 +109,7 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
                             List<TodoOrdersBean.DataBean> dataBeanList = new ArrayList<>();
 
                             for (TodoOrdersBean.DataBean datum : todoOrdersBean.getData()) {
-                                if (datum.getLock().getBleMac().equals(bleBean.getBleDevice().getBleAddress())) {
+                                if (datum.getLock().getBleMac().equals(bleBean.getBleDevice().getBleAddress().toLowerCase())) {
                                     canFind = true;
                                     dataBeanList.add(datum);
                                 }
