@@ -86,9 +86,8 @@ public class BleUtils {
 
     private byte getXor(byte[] bytes) {
         byte temp = bytes[0];
-
-        for (byte aByte : bytes) {
-            temp ^= aByte;
+        for (int i = 1; i < bytes.length; i++) {
+            temp ^= bytes[i];
         }
         return temp;
     }
