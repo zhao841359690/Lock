@@ -87,6 +87,23 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private List<byte[]> write06 = new ArrayList<>();
 
     @SuppressLint("HandlerLeak")
+    private Handler autoConnectHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), new BleWriteCallback<BleDevice>() {
+                @Override
+                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                    if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
+                        BleUtils.newInstance().read(characteristic.getValue());
+                        autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
+                    }
+                }
+            });
+        }
+    };
+
+    @SuppressLint("HandlerLeak")
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -98,7 +115,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         BleUtils.newInstance().read(characteristic.getValue());
                         progressDialog.dismiss();
                         tipDialog.show();
-                        mBle.startNotify(mBleDevice, bleNotiftCallback);
+                        setNotify(mBleDevice);
+                        autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
                     } else {
                         progressDialog.dismiss();
                         Toast.makeText(LockActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
@@ -264,49 +282,51 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         }
     };
 
-    private BleNotiftCallback bleNotiftCallback = new BleNotiftCallback() {
-        @Override
-        public void onChanged(Object device, BluetoothGattCharacteristic characteristic) {
-            if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
-                TypeBean typeBean = BleUtils.newInstance().read(characteristic.getValue());
-                if (typeBean != null) {
-                    if (Constants.READ_4 == typeBean.getType()) {
-                        if (typeBean.getLockType() == Constants.Lock0 || typeBean.getLockType() == Constants.Lock3) {
-                            if (tipDialog != null) {
-                                tipDialog.dismiss();
-                            }
-                        }
-                    } else if (Constants.READ_6 == typeBean.getType()) {
-                        write06.add(typeBean.getData());
-                        if (typeBean.isOk()) {
-                            byte[] data = new byte[write06.size() * 10];
-                            int size = 0;
-                            for (byte[] bytes : write06) {
-                                for (int i = 0; i < bytes.length; i++) {
-                                    data[size + i] = bytes[i];
+    private void setNotify(BleDevice device) {
+        mBle.startNotify(device, new BleNotiftCallback<BleDevice>() {
+            @Override
+            public void onChanged(BleDevice device, BluetoothGattCharacteristic characteristic) {
+                if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
+                    TypeBean typeBean = BleUtils.newInstance().read(characteristic.getValue());
+                    if (typeBean != null) {
+                        if (Constants.READ_4 == typeBean.getType()) {
+                            if (typeBean.getLockType() == Constants.Lock0 || typeBean.getLockType() == Constants.Lock3) {
+                                if (tipDialog != null) {
+                                    tipDialog.dismiss();
                                 }
-                                size += bytes.length;
                             }
-                            byte[] sendData = SocketUtils.write06(data);
-                            write06 = new ArrayList<>();
-                            mThreadPool.execute(() -> {
-                                try {
-                                    outputStream = socket.getOutputStream();
-
-                                    outputStream.write(sendData);
-                                    outputStream.flush();
-
-                                    inputStream = socket.getInputStream();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                        } else if (Constants.READ_6 == typeBean.getType()) {
+                            write06.add(typeBean.getData());
+                            if (typeBean.isOk()) {
+                                byte[] data = new byte[write06.size() * 10];
+                                int size = 0;
+                                for (byte[] bytes : write06) {
+                                    for (int i = 0; i < bytes.length; i++) {
+                                        data[size + i] = bytes[i];
+                                    }
+                                    size += bytes.length;
                                 }
-                            });
+                                byte[] sendData = SocketUtils.write06(data);
+                                write06 = new ArrayList<>();
+                                mThreadPool.execute(() -> {
+                                    try {
+                                        outputStream = socket.getOutputStream();
+
+                                        outputStream.write(sendData);
+                                        outputStream.flush();
+
+                                        inputStream = socket.getInputStream();
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                });
+                            }
                         }
                     }
                 }
             }
-        }
-    };
+        });
+    }
 
     private void openOrClose(boolean openOrClose) {
         progressDialog.setMessage(openOrClose ? "开锁中..." : "关锁中...");
