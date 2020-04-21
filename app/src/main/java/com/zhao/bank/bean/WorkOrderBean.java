@@ -44,6 +44,7 @@ public class WorkOrderBean {
         private String workId;
         private String boxId;
         private String userId;
+        private String approveUserId;
         private String approveStatus;
         private String operationType;
         private String effectTime;
@@ -73,6 +74,14 @@ public class WorkOrderBean {
 
         public void setUserId(String userId) {
             this.userId = userId;
+        }
+
+        public String getApproveUserId() {
+            return approveUserId;
+        }
+
+        public void setApproveUserId(String approveUserId) {
+            this.approveUserId = approveUserId;
         }
 
         public String getApproveStatus() {
@@ -125,16 +134,11 @@ public class WorkOrderBean {
 
         public static class LockBean {
             private String id;
-            private String createdBy;
-            private String createdDate;
-            private String lastModifiedBy;
-            private String lastModifiedDate;
             private String bleMac;
             private String imei;
             private String iccId;
-            private String archStatus;
-            private String power;
-            private int uid;
+            private String rootNbLot;
+            private String uid;
             @SerializedName("new")
             private boolean newX;
 
@@ -144,38 +148,6 @@ public class WorkOrderBean {
 
             public void setId(String id) {
                 this.id = id;
-            }
-
-            public String getCreatedBy() {
-                return createdBy;
-            }
-
-            public void setCreatedBy(String createdBy) {
-                this.createdBy = createdBy;
-            }
-
-            public String getCreatedDate() {
-                return createdDate;
-            }
-
-            public void setCreatedDate(String createdDate) {
-                this.createdDate = createdDate;
-            }
-
-            public String getLastModifiedBy() {
-                return lastModifiedBy;
-            }
-
-            public void setLastModifiedBy(String lastModifiedBy) {
-                this.lastModifiedBy = lastModifiedBy;
-            }
-
-            public String getLastModifiedDate() {
-                return lastModifiedDate;
-            }
-
-            public void setLastModifiedDate(String lastModifiedDate) {
-                this.lastModifiedDate = lastModifiedDate;
             }
 
             public String getBleMac() {
@@ -202,27 +174,19 @@ public class WorkOrderBean {
                 this.iccId = iccId;
             }
 
-            public String getArchStatus() {
-                return archStatus;
+            public String getRootNbLot() {
+                return rootNbLot;
             }
 
-            public void setArchStatus(String archStatus) {
-                this.archStatus = archStatus;
+            public void setRootNbLot(String rootNbLot) {
+                this.rootNbLot = rootNbLot;
             }
 
-            public String getPower() {
-                return power;
-            }
-
-            public void setPower(String power) {
-                this.power = power;
-            }
-
-            public int getUid() {
+            public String getUid() {
                 return uid;
             }
 
-            public void setUid(int uid) {
+            public void setUid(String uid) {
                 this.uid = uid;
             }
 

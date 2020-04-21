@@ -77,7 +77,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private Ble<BleDevice> mBle;
     private BleDevice mBleDevice;
     private String address;
-    private int uid;
+    private String uid;
 
     private ExecutorService mThreadPool;
     private Socket socket;
@@ -166,8 +166,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                     lockBodyNumberTv.setText("锁体编号：" + uid);
                     cabinetNumber.setText("箱体编号：" + workOrderBean.getData().getBoxId());
                     timeTv.setText(workOrderBean.getData().getEffectTime() + " - " + workOrderBean.getData().getInvalidTime());
-                    typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>" + ("0".equals(workOrderBean.getData().getLock().getArchStatus()) ? "关锁" : "开锁") + "</font>"));
-                    tipDialog.setOpenOrClose("1".equals(workOrderBean.getData().getLock().getArchStatus()));
+                    typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>" + (showLock ? "开锁" : "开锁") + "</font>"));
+                    tipDialog.setOpenOrClose(showLock);
                 }, throwable -> {
                     Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
                     finish();

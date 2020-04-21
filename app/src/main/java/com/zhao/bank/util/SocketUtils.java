@@ -14,7 +14,7 @@ public class SocketUtils {
      * @param open   开锁/关锁
      * @return 写入socket的值
      */
-    public static byte[] writeLock(int lockId, boolean open) {
+    public static byte[] writeLock(String lockId, boolean open) {
         byte[] writeLockNormalBytes = new byte[22];
         writeLockNormalBytes[0] = 0x7e;
 
@@ -33,7 +33,7 @@ public class SocketUtils {
         dataBytes[3] = 0x02;
         dataBytes[4] = 0x03;
         dataBytes[5] = 0x04;
-        byte[] lockBytes = DataConvert.intToBytes2(lockId);
+        byte[] lockBytes = lockId.getBytes();
         dataBytes[6] = 0x10;//长度(锁号+用户id的总长度再+2)
         if (open) {//开锁
             dataBytes[7] = (byte) 0xe1;
