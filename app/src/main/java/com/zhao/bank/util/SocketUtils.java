@@ -41,7 +41,7 @@ public class SocketUtils {
             dataBytes[7] = (byte) 0xe2;
         }
         for (int i = 0; i < lockBytes.length; i++) {
-            writeLockNormalBytes[i + 8] = lockBytes[i];//锁号
+            dataBytes[i + 8] = lockBytes[i];//锁号
         }
         byte[] userIdBytes = SharedPreferencesUtils.getInstance().getUserId().getBytes();
         for (int i = 0; i < userIdBytes.length; i++) {
