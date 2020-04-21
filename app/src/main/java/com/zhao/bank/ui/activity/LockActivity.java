@@ -115,7 +115,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         BleUtils.newInstance().read(characteristic.getValue());
                         progressDialog.dismiss();
                         tipDialog.show();
-                        setNotify(mBleDevice);
                         autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
                     } else {
                         progressDialog.dismiss();
@@ -263,6 +262,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         public void onConnectionChanged(BleDevice device) {
             if (device.isConnected()) {
                 mBleDevice = device;
+                setNotify(device);
                 handler.sendEmptyMessageDelayed(0, 2000);
             }
         }
@@ -286,6 +286,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         mBle.startNotify(device, new BleNotiftCallback<BleDevice>() {
             @Override
             public void onChanged(BleDevice device, BluetoothGattCharacteristic characteristic) {
+                Toast.makeText(LockActivity.this, "Notify success", Toast.LENGTH_SHORT).show();
                 if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
                     TypeBean typeBean = BleUtils.newInstance().read(characteristic.getValue());
                     if (typeBean != null) {

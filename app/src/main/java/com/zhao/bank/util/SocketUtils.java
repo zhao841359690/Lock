@@ -49,7 +49,7 @@ public class SocketUtils {
         }
         byte[] encryptBytes = AESUtils.encrypt(dataBytes, Constants.KEY);
         for (int i = 0; i < encryptBytes.length; i++) {
-            writeLockNormalBytes[i + 4] = encryptBytes[i];
+            writeLockNormalBytes[i + 6] = encryptBytes[i];
         }
 
         //拼接校验crc16
