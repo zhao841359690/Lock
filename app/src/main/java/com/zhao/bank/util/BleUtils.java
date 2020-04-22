@@ -27,9 +27,6 @@ public class BleUtils {
         for (int i = 0; i < userIdBytes.length; i++) {
             bytes[i + 5] = userIdBytes[i];
         }
-        for (int i = 0; i < 7; i++) {
-            bytes[i + 9] = 0x00;
-        }
         byte[] encrypt = AESUtils.encrypt(bytes, Constants.KEY);
         byte[] writeConnect = new byte[17];
         for (int i = 0; i <= encrypt.length; i++) {
@@ -71,17 +68,39 @@ public class BleUtils {
                 bytes[14] = data[i * 10 + 8];
                 bytes[15] = data[i * 10 + 9];
             }
+            byte[] encrypt = AESUtils.encrypt(bytes, Constants.KEY);
             byte[] write05 = new byte[17];
-            for (int y = 0; y <= bytes.length; y++) {
-                if (y == bytes.length) {
-                    write05[y] = getXor(bytes);
+            for (int y = 0; y <= encrypt.length; y++) {
+                if (y == encrypt.length) {
+                    write05[y] = getXor(encrypt);
                 } else {
-                    write05[y] = bytes[y];
+                    write05[y] = encrypt[y];
                 }
             }
             allByteList.add(write05);
         }
         return allByteList;
+    }
+
+    public byte[] write06(byte idx, byte ret) {
+        byte[] bytes = new byte[16];
+        bytes[0] = 0x06;
+        byte[] chkBytes = DataConvert.intToBytes2(chk);
+        for (int i = 0; i < chkBytes.length; i++) {
+            bytes[i + 1] = chkBytes[i];
+        }
+        bytes[5] = idx;
+        bytes[6] = ret;
+        byte[] encrypt = AESUtils.encrypt(bytes, Constants.KEY);
+        byte[] write06 = new byte[17];
+        for (int i = 0; i <= encrypt.length; i++) {
+            if (i == encrypt.length) {
+                write06[i] = getXor(encrypt);
+            } else {
+                write06[i] = encrypt[i];
+            }
+        }
+        return write06;
     }
 
     private byte getXor(byte[] bytes) {
@@ -132,6 +151,7 @@ public class BleUtils {
                 typeBean.setType(Constants.READ_5);
             } else if (typeByte == 0x06) {
                 typeBean.setType(Constants.READ_6);
+                typeBean.setIdx(dataBytes[0]);
                 String idx = Integer.toBinaryString((dataBytes[0] & 0xFF) + 0x100).substring(1).substring(0, 1);
                 if ("1".equals(idx)) {//此转发数据发送完成
                     typeBean.setOk(true);

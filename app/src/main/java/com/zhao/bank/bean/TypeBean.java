@@ -3,6 +3,7 @@ package com.zhao.bank.bean;
 public class TypeBean {
     private int type;
     private int lockType;
+    private byte idx;
     private boolean ok;
     private byte[] data;
 
@@ -20,6 +21,14 @@ public class TypeBean {
 
     public void setLockType(int lockType) {
         this.lockType = lockType;
+    }
+
+    public byte getIdx() {
+        return idx;
+    }
+
+    public void setIdx(byte idx) {
+        this.idx = idx;
     }
 
     public boolean isOk() {

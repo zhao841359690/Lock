@@ -299,6 +299,14 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                 }
                             } else if (Constants.READ_6 == typeBean.getType()) {
                                 write06.add(typeBean.getData());
+                                mBle.write(mBleDevice, BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00), new BleWriteCallback<BleDevice>() {
+                                    @Override
+                                    public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                                        if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
+                                            BleUtils.newInstance().read(characteristic.getValue());
+                                        }
+                                    }
+                                });
                                 if (typeBean.isOk()) {
                                     byte[] data = new byte[write06.size() * 10];
                                     int size = 0;
