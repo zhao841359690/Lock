@@ -92,8 +92,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), new BleWriteCallback<BleDevice>() {
+
                 @Override
-                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                public void onWriteSuccess(BleDevice device, BluetoothGattCharacteristic characteristic) {
                     if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
                         BleUtils.newInstance().read(characteristic.getValue());
                         autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
@@ -109,8 +110,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             boolean result = mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), new BleWriteCallback<BleDevice>() {
+
                 @Override
-                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                public void onWriteSuccess(BleDevice device, BluetoothGattCharacteristic characteristic) {
                     if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
                         BleUtils.newInstance().read(characteristic.getValue());
                         progressDialog.dismiss();
@@ -191,7 +193,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mBle.destory(this);
+        mBle.released();
         try {
             outputStream.close();
             inputStream.close();
@@ -230,10 +232,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
     private void initBle() {
         mBle = Ble.options()//开启配置
-                .setLogBleExceptions(true)//设置是否输出打印蓝牙日志（非正式打包请设置为true，以便于调试）
+                .setLogBleEnable(true)//设置是否输出打印蓝牙日志（非正式打包请设置为true，以便于调试）
                 .setThrowBleException(true)//设置是否抛出蓝牙异常
                 .setAutoConnect(false)//设置是否自动连接
-                .setFilterScan(true)//设置是否过滤扫描到的设备
                 .setConnectFailedRetryCount(3)
                 .setConnectTimeout(10 * 1000)//设置连接超时时长（默认10*1000 ms）
                 .setScanPeriod(12 * 1000)//设置扫描时长（默认10*1000 ms）
@@ -359,8 +360,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         List<byte[]> encDataList = BleUtils.newInstance().write05(data);
                         for (byte[] bytes1 : encDataList) {
                             boolean result = mBle.write(mBleDevice, bytes1, new BleWriteCallback<BleDevice>() {
+
                                 @Override
-                                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
+                                public void onWriteSuccess(BleDevice device, BluetoothGattCharacteristic characteristic) {
                                     if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
                                         BleUtils.newInstance().read(characteristic.getValue());
                                     }
