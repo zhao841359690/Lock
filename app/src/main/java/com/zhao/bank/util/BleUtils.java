@@ -51,7 +51,9 @@ public class BleUtils {
                 bytes[y + 1] = chkBytes[y];
             }
             if (i == total - 1) {
-                bytes[5] = (byte) -1;
+                String normal = Integer.toBinaryString(((byte) i & 0xFF) + 0x100).substring(2);
+                String replace = "1" + normal;
+                bytes[5] = (byte) Integer.parseInt(replace, 2);
                 for (int i1 = i * 10; i1 < data.length; i1++) {
                     bytes[i1 % 10 + 6] = data[i1];
                 }
