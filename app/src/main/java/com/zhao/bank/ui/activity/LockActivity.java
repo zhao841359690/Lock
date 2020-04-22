@@ -286,45 +286,47 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         mBle.startNotify(device, new BleNotiftCallback<BleDevice>() {
             @Override
             public void onChanged(BleDevice device, BluetoothGattCharacteristic characteristic) {
-                Toast.makeText(LockActivity.this, "Notify success", Toast.LENGTH_SHORT).show();
-                if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
-                    TypeBean typeBean = BleUtils.newInstance().read(characteristic.getValue());
-                    if (typeBean != null) {
-                        if (Constants.READ_4 == typeBean.getType()) {
-                            if (typeBean.getLockType() == Constants.Lock0 || typeBean.getLockType() == Constants.Lock3) {
-                                if (tipDialog != null) {
-                                    tipDialog.dismiss();
-                                }
-                            }
-                        } else if (Constants.READ_6 == typeBean.getType()) {
-                            write06.add(typeBean.getData());
-                            if (typeBean.isOk()) {
-                                byte[] data = new byte[write06.size() * 10];
-                                int size = 0;
-                                for (byte[] bytes : write06) {
-                                    for (int i = 0; i < bytes.length; i++) {
-                                        data[size + i] = bytes[i];
-                                    }
-                                    size += bytes.length;
-                                }
-                                byte[] sendData = SocketUtils.write06(data);
-                                write06 = new ArrayList<>();
-                                mThreadPool.execute(() -> {
-                                    try {
-                                        outputStream = socket.getOutputStream();
+                runOnUiThread(() -> {
+                    if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
 
-                                        outputStream.write(sendData);
-                                        outputStream.flush();
-
-                                        inputStream = socket.getInputStream();
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
+                        TypeBean typeBean = BleUtils.newInstance().read(characteristic.getValue());
+                        if (typeBean != null) {
+                            if (Constants.READ_4 == typeBean.getType()) {
+                                if (typeBean.getLockType() == Constants.Lock0 || typeBean.getLockType() == Constants.Lock3) {
+                                    if (tipDialog != null) {
+                                        tipDialog.dismiss();
                                     }
-                                });
+                                }
+                            } else if (Constants.READ_6 == typeBean.getType()) {
+                                write06.add(typeBean.getData());
+                                if (typeBean.isOk()) {
+                                    byte[] data = new byte[write06.size() * 10];
+                                    int size = 0;
+                                    for (byte[] bytes : write06) {
+                                        for (int i = 0; i < bytes.length; i++) {
+                                            data[size + i] = bytes[i];
+                                        }
+                                        size += bytes.length;
+                                    }
+                                    byte[] sendData = SocketUtils.write06(data);
+                                    write06 = new ArrayList<>();
+                                    mThreadPool.execute(() -> {
+                                        try {
+                                            outputStream = socket.getOutputStream();
+
+                                            outputStream.write(sendData);
+                                            outputStream.flush();
+
+                                            inputStream = socket.getInputStream();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    });
+                                }
                             }
                         }
                     }
-                }
+                });
             }
         });
     }
