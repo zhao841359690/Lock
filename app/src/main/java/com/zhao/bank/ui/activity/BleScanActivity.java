@@ -79,7 +79,7 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
     @Override
     protected void onPause() {
         super.onPause();
-        mBle.released();
+        mBle.destory(this);
     }
 
     @OnClick({R.id.title_left_rl, R.id.retry_tv})
@@ -139,9 +139,10 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
 
     private void initBle() {
         mBle = Ble.options()//开启配置
-                .setLogBleEnable(true)//设置是否输出打印蓝牙日志（非正式打包请设置为true，以便于调试）
+                .setLogBleExceptions(true)//设置是否输出打印蓝牙日志（非正式打包请设置为true，以便于调试）
                 .setThrowBleException(true)//设置是否抛出蓝牙异常
                 .setAutoConnect(true)//设置是否自动连接
+                .setFilterScan(true)//设置是否过滤扫描到的设备
                 .setConnectFailedRetryCount(3)
                 .setConnectTimeout(10 * 1000)//设置连接超时时长（默认10*1000 ms）
                 .setScanPeriod(12 * 1000)//设置扫描时长（默认10*1000 ms）
