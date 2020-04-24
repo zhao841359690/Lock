@@ -160,7 +160,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(workOrderBean -> {
                     address = workOrderBean.getData().getLock().getBleMac();
-                    uid = workOrderBean.getData().getLock().getUid();
+                    uid = workOrderBean.getData().getLock().getHexUid();
 
                     ticketNumberTv.setText("工单编号：" + workOrderBean.getData().getWorkId());
                     lockBodyNumberTv.setText("锁体编号：" + uid);

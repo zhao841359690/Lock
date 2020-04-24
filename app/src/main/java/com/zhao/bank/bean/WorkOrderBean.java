@@ -139,6 +139,7 @@ public class WorkOrderBean {
             private String iccId;
             private String rootNbLot;
             private String uid;
+            private String hexUid;
             @SerializedName("new")
             private boolean newX;
 
@@ -188,6 +189,14 @@ public class WorkOrderBean {
 
             public void setUid(String uid) {
                 this.uid = uid;
+            }
+
+            public String getHexUid() {
+                return hexUid;
+            }
+
+            public void setHexUid(String hexUid) {
+                this.hexUid = hexUid;
             }
 
             public boolean isNewX() {

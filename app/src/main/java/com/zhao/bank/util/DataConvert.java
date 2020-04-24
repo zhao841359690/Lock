@@ -25,4 +25,17 @@ public class DataConvert {
     public static int byteToInt2(byte[] b) {
         return (((int) b[0]) << 24) + (((int) b[1]) << 16) + (((int) b[2]) << 8) + b[3];
     }
+
+    public static byte[] hexToByteArray(String hexStr) {
+        char[] chars = hexStr.toCharArray();
+        byte[] bytes = new byte[chars.length / 2];
+        int index = 0;
+        for (int i = 0; i < chars.length; i++) {
+            int highBit = hexStr.indexOf(chars[i]);
+            int lowBit = hexStr.indexOf(chars[++i]);
+            bytes[index] = (byte) (highBit << 4 | lowBit);
+            index++;
+        }
+        return bytes;
+    }
 }

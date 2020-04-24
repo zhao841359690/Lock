@@ -10,7 +10,7 @@ public class SocketUtils {
     /**
      * 开关锁协议
      *
-     * @param lockId
+     * @param lockId 锁id
      * @param open   开锁/关锁
      * @return 写入socket的值
      */
@@ -33,7 +33,7 @@ public class SocketUtils {
         dataBytes[3] = 0x02;
         dataBytes[4] = 0x03;
         dataBytes[5] = 0x04;
-        byte[] lockBytes = lockId.getBytes();
+        byte[] lockBytes = DataConvert.hexToByteArray(lockId);
         dataBytes[6] = 0x10;//长度(锁号+用户id的总长度再+2)
         if (open) {//开锁
             dataBytes[7] = (byte) 0xe1;

@@ -201,7 +201,8 @@ public class TodoOrdersBean implements Serializable {
             private String iccId;
             private String archStatus;
             private String power;
-            private int uid;
+            private String uid;
+            private String hexUid;
             @SerializedName("new")
             private boolean newX;
 
@@ -285,12 +286,20 @@ public class TodoOrdersBean implements Serializable {
                 this.power = power;
             }
 
-            public int getUid() {
+            public String getUid() {
                 return uid;
             }
 
-            public void setUid(int uid) {
+            public void setUid(String uid) {
                 this.uid = uid;
+            }
+
+            public String getHexUid() {
+                return hexUid;
+            }
+
+            public void setHexUid(String hexUid) {
+                this.hexUid = hexUid;
             }
 
             public boolean isNewX() {
