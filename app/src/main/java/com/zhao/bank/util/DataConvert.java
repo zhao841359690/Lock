@@ -1,5 +1,7 @@
 package com.zhao.bank.util;
 
+import java.util.List;
+
 public class DataConvert {
     /**
      * 将int类型的数据转换为byte数组
@@ -67,5 +69,14 @@ public class DataConvert {
             sb.append(hex);
         }
         return sb.toString();
+    }
+
+    public static boolean isChkSame(List<Boolean> list1, List<Boolean> list2) {
+        for (int i = 0; i < list1.size(); i++) {
+            if (list1.get(i) != list2.get(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

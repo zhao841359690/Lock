@@ -12,7 +12,16 @@ public class BleUtils {
     private static BleUtils bleUtils = null;
 
     private int chk = 0;
-    private short upChk = 0;
+    private List<Boolean> myUpChkList;
+
+    public BleUtils() {
+        if (myUpChkList == null) {
+            myUpChkList = new ArrayList<>(16);
+            for (int i = 0; i < 16; i++) {
+                myUpChkList.add(false);
+            }
+        }
+    }
 
     public static BleUtils newInstance() {
         if (bleUtils == null) {
@@ -137,14 +146,13 @@ public class BleUtils {
                 dataBytes[i - 5] = bytes1[i];
             }
         }
-        int getChk = DataConvert.byteToInt2(chkBytes);
-        short getUpChk = chkGetUpRandom(getChk);
+        List<Boolean> getUpChkList = chkGetUpRandom(chkBytes);
         //判断上行随机数是否和上次相同，如果相同则不做任何操作
-        if (upChk == getUpChk) {
+        if (DataConvert.isChkSame(getUpChkList, myUpChkList)) {
             return null;
         } else {
-            upChk = getUpChk;
-            chk = chkUpdateDownRandom(getChk);
+            myUpChkList = getUpChkList;
+            chk = chkUpdateDownRandom(chkBytes);
             if (typeByte == 0x01) {
                 typeBean.setType(Constants.READ_1);
             } else if (typeByte == 0x04) {
@@ -188,43 +196,39 @@ public class BleUtils {
      * 功能: 获取上行随机数
      * 说明: 在验证码中获取上行随机数
      *
-     * @param chkCode 接收数据帧的验证码
+     * @param chkBytes 接收数据帧的验证码
      * @return 上行随机数
      */
-    private short chkGetUpRandom(int chkCode) {
-        short ret;
-        ret = 0;
-        for (byte i = 0; i < 16; i++) {
-            ret <<= 1;
-            if ((chkCode & 0x80000000) != 0x0) {
-                ret |= 0x0001;
-            }
-            chkCode <<= 2;
+    private List<Boolean> chkGetUpRandom(byte[] chkBytes) {
+        List<Boolean> upList = new ArrayList<>(16);
+        for (int i = 0; i < 16; i++) {
+            upList.add(false);
         }
-        return ret;
+        BitArray bitArray = new BitArray(32, chkBytes);
+        for (int i = 0; i < 32; i++) {
+            if (i % 2 != 0) {//偶数位
+                upList.set(i, bitArray.get(i));
+            }
+        }
+        return upList;
     }
 
     /**
      * 功能: 更新下行随机数
-     * 说明: 更新验证码中的下行随机数
+     * 说明: 更新验证码中的下行随机数(奇数位1-32)
      *
-     * @param chkCode 原始验证码
+     * @param chkBytes 接收数据帧的验证码
      * @return 新的验证码
      */
-    private int chkUpdateDownRandom(int chkCode) {
+    private int chkUpdateDownRandom(byte[] chkBytes) {
         Random random = new Random();
-        short downRandom = (short) random.nextInt(Short.MAX_VALUE);
 
-        int tmp;
-        tmp = 0x40000000;
-        for (byte i = 0; i < 16; i++) {
-            chkCode &= ~tmp;
-            if ((downRandom & 0x8000) != 0x0) {
-                chkCode |= tmp;
+        BitArray bitArray = new BitArray(32, chkBytes);
+        for (int i = 0; i < 32; i++) {
+            if (i % 2 == 0) {//奇数位
+                bitArray.set(i, random.nextBoolean());
             }
-            tmp >>= 2;
-            downRandom <<= 1;
         }
-        return chkCode;
+        return DataConvert.byteToInt2(bitArray.toByteArray());
     }
 }
