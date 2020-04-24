@@ -389,18 +389,18 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                     } else {
                         progressDialog.dismiss();
                         tipDialog.dismiss();
-                        Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     progressDialog.dismiss();
                     tipDialog.dismiss();
-                    Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
                 progressDialog.dismiss();
                 tipDialog.dismiss();
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
