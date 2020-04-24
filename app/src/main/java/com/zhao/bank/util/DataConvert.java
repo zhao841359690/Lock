@@ -26,16 +26,46 @@ public class DataConvert {
         return (((int) b[0]) << 24) + (((int) b[1]) << 16) + (((int) b[2]) << 8) + b[3];
     }
 
-    public static byte[] hexToByteArray(String hexStr) {
-        char[] chars = hexStr.toCharArray();
-        byte[] bytes = new byte[chars.length / 2];
-        int index = 0;
-        for (int i = 0; i < chars.length; i++) {
-            int highBit = hexStr.indexOf(chars[i]);
-            int lowBit = hexStr.indexOf(chars[++i]);
-            bytes[index] = (byte) (highBit << 4 | lowBit);
-            index++;
+
+    private static byte hexToByte(String inHex) {
+        return (byte) Integer.parseInt(inHex, 16);
+    }
+
+    public static byte[] hexToByteArray(String inHex) {
+        int hexlen = inHex.length();
+        byte[] result;
+        if (hexlen % 2 == 1) {
+            hexlen++;
+            result = new byte[(hexlen / 2)];
+            inHex = "0" + inHex;
+        } else {
+            result = new byte[(hexlen / 2)];
         }
-        return bytes;
+        int j = 0;
+        for (int i = 0; i < hexlen; i += 2) {
+            result[j] = hexToByte(inHex.substring(i, i + 2));
+            j++;
+        }
+        return result;
+    }
+
+    public static String byteToHex(byte b) {
+        String hex = Integer.toHexString(b & 0xFF);
+        if (hex.length() < 2) {
+            hex = "0" + hex;
+        }
+        return hex;
+    }
+
+    public static String bytesToHex(byte[] bytes) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < bytes.length; i++) {
+            String hex = Integer.toHexString(bytes[i] & 0xFF);
+            if (hex.length() < 2) {
+                sb.append(0);
+            }
+            sb.append(hex);
+        }
+        return sb.toString();
     }
 }
