@@ -9,11 +9,20 @@ import java.util.List;
 import java.util.Random;
 
 public class BleUtils {
+    private static BleUtils bleUtils = null;
+
     private int chk = 0;
     private short upChk = 0;
 
     public static BleUtils newInstance() {
-        return new BleUtils();
+        if (bleUtils == null) {
+            synchronized (BleUtils.class) {
+                if (bleUtils == null) {
+                    bleUtils = new BleUtils();
+                }
+            }
+        }
+        return bleUtils;
     }
 
     public byte[] writeConnect() {
