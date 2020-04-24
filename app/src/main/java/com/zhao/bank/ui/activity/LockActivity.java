@@ -96,6 +96,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
                     if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
                         BleUtils.newInstance().read(characteristic.getValue());
+
+                        autoConnectHandler.removeMessages(0);
                         autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
                     }
                 }
@@ -115,6 +117,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         BleUtils.newInstance().read(characteristic.getValue());
                         progressDialog.dismiss();
                         tipDialog.show();
+
+                        autoConnectHandler.removeMessages(0);
                         autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
                     } else {
                         progressDialog.dismiss();
@@ -199,6 +203,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         } catch (Exception e) {
             e.printStackTrace();
         }
+        handler.removeMessages(0);
+        autoConnectHandler.removeMessages(0);
     }
 
     @OnClick({R.id.title_left_rl, R.id.lock_ly})
