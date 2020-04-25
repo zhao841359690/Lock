@@ -91,16 +91,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), new BleWriteCallback<BleDevice>() {
-                @Override
-                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                    if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
-                        BleUtils.newInstance().read(characteristic.getValue());
-
-                        autoConnectHandler.removeMessages(0);
-                        autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
-                    }
-                }
+            mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), characteristic -> {
+                autoConnectHandler.removeMessages(0);
+                autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
             });
         }
     };
@@ -110,21 +103,12 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            boolean result = mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), new BleWriteCallback<BleDevice>() {
-                @Override
-                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                    if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
-                        BleUtils.newInstance().read(characteristic.getValue());
-                        progressDialog.dismiss();
-                        tipDialog.show();
+            boolean result = mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), characteristic -> {
+                progressDialog.dismiss();
+                tipDialog.show();
 
-                        autoConnectHandler.removeMessages(0);
-                        autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
-                    } else {
-                        progressDialog.dismiss();
-                        Toast.makeText(LockActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
-                    }
-                }
+                autoConnectHandler.removeMessages(0);
+                autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
             });
 
             if (!result) {
@@ -305,13 +289,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                 }
                             } else if (Constants.READ_6 == typeBean.getType()) {
                                 write06.add(typeBean.getData());
-                                mBle.write(mBleDevice, BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00), new BleWriteCallback<BleDevice>() {
-                                    @Override
-                                    public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                                        if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
-                                            BleUtils.newInstance().read(characteristic.getValue());
-                                        }
-                                    }
+                                mBle.write(mBleDevice, BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00), characteristic1 -> {
                                 });
                                 if (typeBean.isOk()) {
                                     byte[] data = new byte[write06.size() * 10];
@@ -374,13 +352,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                     if (read != -1 || Arrays.equals(data, Constants.ERROR)) {
                         List<byte[]> encDataList = BleUtils.newInstance().write05(data);
                         for (byte[] bytes1 : encDataList) {
-                            boolean result = mBle.write(mBleDevice, bytes1, new BleWriteCallback<BleDevice>() {
-                                @Override
-                                public void onWriteSuccess(BluetoothGattCharacteristic characteristic) {
-                                    if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
-                                        BleUtils.newInstance().read(characteristic.getValue());
-                                    }
-                                }
+                            boolean result = mBle.write(mBleDevice, bytes1, characteristic -> {
                             });
                             if (!result) {
                                 progressDialog.dismiss();
