@@ -321,7 +321,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                         }
                                         size += bytes.length;
                                     }
-                                    byte[] sendData = SocketUtils.write06(data);
                                     write06 = new ArrayList<>();
                                     mThreadPool.execute(() -> {
                                         try {
@@ -329,7 +328,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
                                             outputStream = socket.getOutputStream();
 
-                                            outputStream.write(sendData);
+                                            outputStream.write(data);
                                             outputStream.flush();
                                         } catch (IOException e) {
                                             e.printStackTrace();
