@@ -29,6 +29,7 @@ import com.zhao.bank.util.SocketUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -192,6 +193,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         try {
             outputStream.close();
             inputStream.close();
+            socket.shutdownInput();
+            socket.shutdownOutput();
             socket.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -320,12 +323,12 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                     write06 = new ArrayList<>();
                                     mThreadPool.execute(() -> {
                                         try {
+                                            socket.connect(new InetSocketAddress(Constants.IP, Constants.PORT));
+
                                             outputStream = socket.getOutputStream();
 
                                             outputStream.write(sendData);
                                             outputStream.flush();
-
-                                            inputStream = socket.getInputStream();
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
@@ -345,6 +348,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
         mThreadPool.execute(() -> {
             try {
+                socket.connect(new InetSocketAddress(Constants.IP, Constants.PORT));
+
                 outputStream = socket.getOutputStream();
 
                 outputStream.write(SocketUtils.writeLock(uid, openOrClose));
