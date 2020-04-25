@@ -3,6 +3,7 @@ package com.zhao.bank.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothGattCharacteristic;
+import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
@@ -132,6 +133,12 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         titleLineView.setVisibility(View.GONE);
 
         tipDialog = new TipDialog(this, this);
+        tipDialog.setOnDismissListener(dialogInterface -> {
+            if (mBle != null && mBleDevice != null) {
+                mBle.disconnect(mBleDevice);
+            }
+        });
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setCanceledOnTouchOutside(false);
 
