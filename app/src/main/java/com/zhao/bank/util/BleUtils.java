@@ -207,7 +207,7 @@ public class BleUtils {
         BitArray bitArray = new BitArray(32, chkBytes);
         for (int i = 0; i < 32; i++) {
             if (i % 2 != 0) {//偶数位
-                upList.set(i, bitArray.get(i));
+                upList.set(i / 2, bitArray.get(i));
             }
         }
         return upList;
