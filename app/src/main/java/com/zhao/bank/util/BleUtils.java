@@ -11,7 +11,7 @@ import java.util.Random;
 public class BleUtils {
     private static BleUtils bleUtils = null;
 
-    private int chk = 0;
+    private byte[] chk = new byte[4];
     private List<Boolean> myUpChkList;
 
     public BleUtils() {
@@ -34,12 +34,22 @@ public class BleUtils {
         return bleUtils;
     }
 
+    public void clearData() {
+        chk = null;
+        chk = new byte[4];
+
+        myUpChkList = null;
+        myUpChkList = new ArrayList<>(16);
+        for (int i = 0; i < 16; i++) {
+            myUpChkList.add(false);
+        }
+    }
+
     public byte[] writeConnect() {
         byte[] bytes = new byte[16];
         bytes[0] = 0x01;
-        byte[] chkBytes = DataConvert.intToBytes2(chk);
-        for (int i = 0; i < chkBytes.length; i++) {
-            bytes[i + 1] = chkBytes[i];
+        for (int i = 0; i < chk.length; i++) {
+            bytes[i + 1] = chk[i];
         }
         byte[] userIdBytes = SharedPreferencesUtils.getInstance().getUserId().getBytes();
         for (int i = 0; i < userIdBytes.length; i++) {
@@ -64,9 +74,8 @@ public class BleUtils {
         for (int i = 0; i < total; i++) {
             byte[] bytes = new byte[16];
             bytes[0] = 0x05;
-            byte[] chkBytes = DataConvert.intToBytes2(chk);
-            for (int y = 0; y < chkBytes.length; y++) {
-                bytes[y + 1] = chkBytes[y];
+            for (int y = 0; y < chk.length; y++) {
+                bytes[y + 1] = chk[y];
             }
             if (i == total - 1) {
                 String normal = Integer.toBinaryString(((byte) i & 0xFF) + 0x100).substring(2);
@@ -105,9 +114,8 @@ public class BleUtils {
     public byte[] write06(byte idx, byte ret) {
         byte[] bytes = new byte[16];
         bytes[0] = 0x06;
-        byte[] chkBytes = DataConvert.intToBytes2(chk);
-        for (int i = 0; i < chkBytes.length; i++) {
-            bytes[i + 1] = chkBytes[i];
+        for (int i = 0; i < chk.length; i++) {
+            bytes[i + 1] = chk[i];
         }
         bytes[5] = idx;
         bytes[6] = ret;
@@ -205,7 +213,7 @@ public class BleUtils {
             upList.add(false);
         }
         BitArray bitArray = new BitArray(32, chkBytes);
-        for (int i = 32; i > 0; i--) {
+        for (int i = 0; i < 32; i++) {
             if (i % 2 == 0) {//偶数位
                 upList.set(i / 2, bitArray.get(i));
             }
@@ -220,7 +228,7 @@ public class BleUtils {
      * @param chkBytes 接收数据帧的验证码
      * @return 新的验证码
      */
-    private int chkUpdateDownRandom(byte[] chkBytes) {
+    private byte[] chkUpdateDownRandom(byte[] chkBytes) {
         Random random = new Random();
 
         BitArray bitArray = new BitArray(32, chkBytes);
@@ -229,6 +237,6 @@ public class BleUtils {
                 bitArray.set(i, random.nextBoolean());
             }
         }
-        return DataConvert.byteToInt2(bitArray.toByteArray());
+        return bitArray.toByteArray();
     }
 }

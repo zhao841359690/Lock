@@ -200,6 +200,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
             case R.id.lock_ly:
                 progressDialog.setMessage("蓝牙连接中...");
                 progressDialog.show();
+                BleUtils.newInstance().clearData();
                 mBle.connect(address.toUpperCase(), connectCallback);
                 break;
         }
