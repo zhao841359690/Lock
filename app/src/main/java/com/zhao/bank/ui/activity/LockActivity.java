@@ -191,6 +191,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         super.onDestroy();
         mBle.destory(this);
         try {
+            mThreadPool.shutdown();
+
             outputStream.close();
             inputStream.close();
             socket.shutdownInput();
