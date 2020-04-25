@@ -67,48 +67,26 @@ public class BleUtils {
         return writeConnect;
     }
 
-    public List<byte[]> write05(byte[] data) {
-        List<byte[]> allByteList = new ArrayList<>();
-        int total = (int) Math.ceil(data.length / 10.0);
-
-        for (int i = 0; i < total; i++) {
-            byte[] bytes = new byte[16];
-            bytes[0] = 0x05;
-            for (int y = 0; y < chk.length; y++) {
-                bytes[y + 1] = chk[y];
-            }
-            if (i == total - 1) {
-                String normal = Integer.toBinaryString(((byte) i & 0xFF) + 0x100).substring(2);
-                String replace = "1" + normal;
-                bytes[5] = (byte) Integer.parseInt(replace, 2);
-                for (int i1 = i * 10; i1 < data.length; i1++) {
-                    bytes[i1 % 10 + 6] = data[i1];
-                }
-            } else {
-                bytes[5] = (byte) i;
-                bytes[6] = data[i * 10];
-                bytes[7] = data[i * 10 + 1];
-                bytes[8] = data[i * 10 + 2];
-                bytes[9] = data[i * 10 + 3];
-                bytes[10] = data[i * 10 + 4];
-                bytes[11] = data[i * 10 + 5];
-                bytes[12] = data[i * 10 + 6];
-                bytes[13] = data[i * 10 + 7];
-                bytes[14] = data[i * 10 + 8];
-                bytes[15] = data[i * 10 + 9];
-            }
-            byte[] encrypt = AESUtils.encrypt(bytes, Constants.KEY);
-            byte[] write05 = new byte[17];
-            for (int y = 0; y <= encrypt.length; y++) {
-                if (y == encrypt.length) {
-                    write05[y] = getXor(encrypt);
-                } else {
-                    write05[y] = encrypt[y];
-                }
-            }
-            allByteList.add(write05);
+    public byte[] write05(int idx, byte[] data) {
+        byte[] bytes = new byte[16];
+        bytes[0] = 0x05;
+        for (int i = 0; i < chk.length; i++) {
+            bytes[i + 1] = chk[i];
         }
-        return allByteList;
+        bytes[5] = (byte) idx;
+        for (int i = 0; i < data.length; i++) {
+            bytes[i + 6] = data[i];
+        }
+        byte[] encrypt = AESUtils.encrypt(bytes, Constants.KEY);
+        byte[] write05 = new byte[17];
+        for (int i = 0; i <= encrypt.length; i++) {
+            if (i == encrypt.length) {
+                write05[i] = getXor(encrypt);
+            } else {
+                write05[i] = encrypt[i];
+            }
+        }
+        return write05;
     }
 
     public byte[] write06(byte idx, byte ret) {
@@ -176,9 +154,18 @@ public class BleUtils {
                 }
             } else if (typeByte == 0x05) {
                 typeBean.setType(Constants.READ_5);
+                typeBean.setIdx(dataBytes[0]);
+                typeBean.setRet(dataBytes[1]);
+                String idx = Integer.toBinaryString((dataBytes[0] & 0xFF) + 0x100).substring(1).substring(0, 1);
+                if ("1".equals(idx)) {
+                    typeBean.setOk(true);
+                } else {
+                    typeBean.setOk(false);
+                }
             } else if (typeByte == 0x06) {
                 typeBean.setType(Constants.READ_6);
                 typeBean.setIdx(dataBytes[0]);
+                typeBean.setRet(dataBytes[1]);
                 String idx = Integer.toBinaryString((dataBytes[0] & 0xFF) + 0x100).substring(1).substring(0, 1);
                 if ("1".equals(idx)) {//此转发数据发送完成
                     typeBean.setOk(true);

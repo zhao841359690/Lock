@@ -3,10 +3,10 @@ package com.zhao.bank.ui.activity;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothGattCharacteristic;
-import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,6 +22,7 @@ import com.zhao.bank.bean.WorkOrderBean;
 import com.zhao.bank.core.constant.Constants;
 import com.zhao.bank.ui.dialog.TipDialog;
 import com.zhao.bank.util.BleUtils;
+import com.zhao.bank.util.DataConvert;
 import com.zhao.bank.util.SharedPreferencesUtils;
 import com.zhao.bank.util.SocketUtils;
 
@@ -41,7 +42,6 @@ import butterknife.OnClick;
 import cn.com.heaton.blelibrary.ble.Ble;
 import cn.com.heaton.blelibrary.ble.callback.BleConnectCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleNotiftCallback;
-import cn.com.heaton.blelibrary.ble.callback.BleWriteCallback;
 import cn.com.heaton.blelibrary.ble.model.BleDevice;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import rxhttp.wrapper.param.RxHttp;
@@ -85,6 +85,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private OutputStream outputStream;
     private InputStream inputStream;
 
+    private List<byte[]> write05 = new ArrayList<>();
+    private int write05Index = 0;
     private List<byte[]> write06 = new ArrayList<>();
 
     @SuppressLint("HandlerLeak")
@@ -295,6 +297,12 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                         tipDialog.dismiss();
                                     }
                                 }
+                            } else if (Constants.READ_5 == typeBean.getType()) {
+                                if (!typeBean.isOk() && write05Index < (write05.size() - 1)) {
+                                    write05Index++;
+                                    mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
+                                    });
+                                }
                             } else if (Constants.READ_6 == typeBean.getType()) {
                                 write06.add(typeBean.getData());
                                 mBle.write(mBleDevice, BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00), characteristic1 -> {
@@ -357,14 +365,13 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                             data[i] = elseData[i - 2];
                         }
                     }
-                    if (read != -1 || Arrays.equals(data, Constants.ERROR)) {
-                        List<byte[]> encDataList = BleUtils.newInstance().write05(data);
-                        for (byte[] bytes1 : encDataList) {
-                            boolean result = mBle.write(mBleDevice, bytes1, characteristic -> {
-                            });
-                            if (!result) {
-                                progressDialog.dismiss();
-                            }
+                    if (read != -1 && !Arrays.equals(data, Constants.ERROR)) {
+                        write05 = DataConvert.needSend05(data);
+                        write05Index = 0;
+                        boolean result = mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
+                        });
+                        if (!result) {
+                            progressDialog.dismiss();
                         }
                     } else {
                         progressDialog.dismiss();

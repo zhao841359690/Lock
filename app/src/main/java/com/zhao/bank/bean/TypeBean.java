@@ -4,6 +4,7 @@ public class TypeBean {
     private int type;
     private int lockType;
     private byte idx;
+    private byte ret;
     private boolean ok;
     private byte[] data;
 
@@ -29,6 +30,14 @@ public class TypeBean {
 
     public void setIdx(byte idx) {
         this.idx = idx;
+    }
+
+    public byte getRet() {
+        return ret;
+    }
+
+    public void setRet(byte ret) {
+        this.ret = ret;
     }
 
     public boolean isOk() {

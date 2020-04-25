@@ -1,5 +1,6 @@
 package com.zhao.bank.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DataConvert {
@@ -78,5 +79,32 @@ public class DataConvert {
             }
         }
         return true;
+    }
+
+    public static List<byte[]> needSend05(byte[] data) {
+        List<byte[]> needSendList = new ArrayList<>();
+        int total = (int) Math.ceil(data.length / 10.0);
+
+        for (int i = 0; i < total; i++) {
+            byte[] bytes = new byte[10];
+            if (i == total - 1) {
+                for (int i1 = i * 10; i1 < data.length; i1++) {
+                    bytes[i1 % 10 + 1] = data[i1];
+                }
+            } else {
+                bytes[0] = data[i * 10];
+                bytes[1] = data[i * 10 + 1];
+                bytes[2] = data[i * 10 + 2];
+                bytes[3] = data[i * 10 + 3];
+                bytes[4] = data[i * 10 + 4];
+                bytes[5] = data[i * 10 + 5];
+                bytes[6] = data[i * 10 + 6];
+                bytes[7] = data[i * 10 + 7];
+                bytes[8] = data[i * 10 + 8];
+                bytes[9] = data[i * 10 + 9];
+            }
+            needSendList.add(bytes);
+        }
+        return needSendList;
     }
 }
