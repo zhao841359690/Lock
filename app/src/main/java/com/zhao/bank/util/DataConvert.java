@@ -89,7 +89,7 @@ public class DataConvert {
             byte[] bytes = new byte[10];
             if (i == total - 1) {
                 for (int i1 = i * 10; i1 < data.length; i1++) {
-                    bytes[i1 % 10 + 1] = data[i1];
+                    bytes[i1 % 10] = data[i1];
                 }
             } else {
                 bytes[0] = data[i * 10];
