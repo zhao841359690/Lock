@@ -205,8 +205,8 @@ public class BleUtils {
             upList.add(false);
         }
         BitArray bitArray = new BitArray(32, chkBytes);
-        for (int i = 0; i < 32; i++) {
-            if (i % 2 != 0) {//偶数位
+        for (int i = 32; i > 0; i--) {
+            if (i % 2 == 0) {//偶数位
                 upList.set(i / 2, bitArray.get(i));
             }
         }
@@ -225,7 +225,7 @@ public class BleUtils {
 
         BitArray bitArray = new BitArray(32, chkBytes);
         for (int i = 0; i < 32; i++) {
-            if (i % 2 == 0) {//奇数位
+            if (i % 2 != 0) {//奇数位
                 bitArray.set(i, random.nextBoolean());
             }
         }
