@@ -24,7 +24,6 @@ import com.zhao.bank.util.SharedPreferencesUtils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -43,8 +42,6 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
     TextView retryTv;
     @BindView(R.id.ble_scan_rv)
     RecyclerView mRecyclerView;
-
-    private Ble<BleDevice> mBle;
 
     private BleScanAdapter mAdapter;
     private List<BleBean> bleBeanList = new ArrayList<>();
@@ -72,14 +69,7 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
 
         mRecyclerView.setAdapter(mAdapter);
 
-        initBle();
         scan();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mBle.destory(this);
     }
 
     @OnClick({R.id.title_left_rl, R.id.retry_tv})
@@ -97,7 +87,7 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
     @SuppressLint("CheckResult")
     @Override
     public void onItemClick(BleBean bleBean) {
-        mBle.stopScan();
+        BaseApp.mBle.stopScan();
         RxHttp.get("/app/todoOrders")
                 .add("token", SharedPreferencesUtils.getInstance().getToken())
                 .asClass(TodoOrdersBean.class)
@@ -137,35 +127,19 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
                 });
     }
 
-    private void initBle() {
-        mBle = Ble.options()//开启配置
-                .setLogBleExceptions(true)//设置是否输出打印蓝牙日志（非正式打包请设置为true，以便于调试）
-                .setThrowBleException(true)//设置是否抛出蓝牙异常
-                .setAutoConnect(true)//设置是否自动连接
-                .setFilterScan(true)//设置是否过滤扫描到的设备
-                .setConnectFailedRetryCount(3)
-                .setConnectTimeout(10 * 1000)//设置连接超时时长（默认10*1000 ms）
-                .setScanPeriod(12 * 1000)//设置扫描时长（默认10*1000 ms）
-                .setUuidService(UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb"))//主服务的uuid
-                .setUuidWriteCha(UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb"))//可写特征的uuid
-                .setUuidReadCha(UUID.fromString("0000ffe2-0000-1000-8000-00805f9b34fb"))//可读特征的uuid
-                .setUuidNotify(UUID.fromString("0000ffe2-0000-1000-8000-00805f9b34fb"))
-                .create(this);
-
-    }
 
     private void scan() {
-        if (!mBle.isSupportBle(BaseApp.getContext())) {
+        if (!BaseApp.mBle.isSupportBle(BaseApp.getContext())) {
             Toast.makeText(BaseApp.getContext(), "BLE is not supported", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (!mBle.isBleEnable()) {
+        if (!BaseApp.mBle.isBleEnable()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, Ble.REQUEST_ENABLE_BT);
             return;
         }
 
-        mBle.startScan(new BleScanCallback<BleDevice>() {
+        BaseApp.mBle.startScan(new BleScanCallback<BleDevice>() {
             @Override
             public void onStart() {
                 super.onStart();

@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -15,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.zhao.bank.R;
+import com.zhao.bank.app.BaseApp;
 import com.zhao.bank.base.BaseActivity;
 import com.zhao.bank.bean.TodoOrdersBean;
 import com.zhao.bank.bean.TypeBean;
@@ -34,13 +34,11 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import cn.com.heaton.blelibrary.ble.Ble;
 import cn.com.heaton.blelibrary.ble.callback.BleConnectCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleNotiftCallback;
 import cn.com.heaton.blelibrary.ble.model.BleDevice;
@@ -76,7 +74,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private TipDialog tipDialog;
     private ProgressDialog progressDialog;
 
-    private Ble<BleDevice> mBle;
     private BleDevice mBleDevice;
     private String address;
     private String uid;
@@ -95,7 +92,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), characteristic -> {
+            BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), characteristic -> {
                 autoConnectHandler.removeMessages(0);
                 autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
             });
@@ -107,7 +104,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            boolean result = mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), characteristic -> {
+            boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), characteristic -> {
                 progressDialog.dismiss();
                 tipDialog.show();
 
@@ -129,7 +126,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
     @Override
     protected void initView() {
-        initBle();
         initSocket();
 
         titleLeftIv.setVisibility(View.VISIBLE);
@@ -137,8 +133,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
         tipDialog = new TipDialog(this, this);
         tipDialog.setOnDismissListener(dialogInterface -> {
-            if (mBle != null && mBleDevice != null) {
-                mBle.disconnect(mBleDevice);
+            if (BaseApp.mBle != null && mBleDevice != null) {
+                BaseApp.mBle.disconnect(mBleDevice);
             }
         });
 
@@ -189,7 +185,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mBle.destory(this);
         try {
             mThreadPool.shutdown();
 
@@ -215,7 +210,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 progressDialog.setMessage("蓝牙连接中...");
                 progressDialog.show();
                 BleUtils.newInstance().clearData();
-                mBle.connect(address.toUpperCase(), connectCallback);
+                BaseApp.mBle.connect(address.toUpperCase(), connectCallback);
                 break;
         }
     }
@@ -231,22 +226,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         } else if (type == Constants.CLOSE) {
             openOrClose(false);
         }
-    }
-
-    private void initBle() {
-        mBle = Ble.options()//开启配置
-                .setLogBleExceptions(true)//设置是否输出打印蓝牙日志（非正式打包请设置为true，以便于调试）
-                .setThrowBleException(true)//设置是否抛出蓝牙异常
-                .setAutoConnect(false)//设置是否自动连接
-                .setFilterScan(true)//设置是否过滤扫描到的设备
-                .setConnectFailedRetryCount(3)
-                .setConnectTimeout(10 * 1000)//设置连接超时时长（默认10*1000 ms）
-                .setScanPeriod(12 * 1000)//设置扫描时长（默认10*1000 ms）
-                .setUuidService(UUID.fromString("0000ffe0-0000-1000-8000-00805f9b34fb"))//主服务的uuid
-                .setUuidWriteCha(UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb"))//可写特征的uuid
-                .setUuidReadCha(UUID.fromString("0000ffe2-0000-1000-8000-00805f9b34fb"))//可读特征的uuid
-                .setUuidNotify(UUID.fromString("0000ffe2-0000-1000-8000-00805f9b34fb"))
-                .create(this);
     }
 
     private void initSocket() {
@@ -288,7 +267,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     };
 
     private void setNotify(BleDevice device) {
-        mBle.startNotify(device, new BleNotiftCallback<BleDevice>() {
+        BaseApp.mBle.startNotify(device, new BleNotiftCallback<BleDevice>() {
             @Override
             public void onChanged(BleDevice device, BluetoothGattCharacteristic characteristic) {
                 runOnUiThread(() -> {
@@ -305,12 +284,12 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                             } else if (Constants.READ_5 == typeBean.getType()) {
                                 if (!typeBean.isOk() && write05Index < (write05.size() - 1)) {
                                     write05Index++;
-                                    mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
+                                    BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
                                     });
                                 }
                             } else if (Constants.READ_6 == typeBean.getType()) {
                                 write06.add(typeBean.getData());
-                                mBle.write(mBleDevice, BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00), characteristic1 -> {
+                                BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00), characteristic1 -> {
                                 });
                                 if (typeBean.isOk()) {
                                     byte[] data = new byte[write06.size() * 10];
@@ -324,7 +303,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                     write06 = new ArrayList<>();
                                     mThreadPool.execute(() -> {
                                         try {
-                                            socket.connect(new InetSocketAddress(Constants.IP, Constants.PORT));
+                                            if (!socket.isConnected()) {
+                                                socket.connect(new InetSocketAddress(Constants.IP, Constants.PORT));
+                                            }
 
                                             outputStream = socket.getOutputStream();
 
@@ -349,7 +330,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
         mThreadPool.execute(() -> {
             try {
-                socket.connect(new InetSocketAddress(Constants.IP, Constants.PORT));
+                if (!socket.isConnected()) {
+                    socket.connect(new InetSocketAddress(Constants.IP, Constants.PORT));
+                }
 
                 outputStream = socket.getOutputStream();
 
@@ -374,26 +357,39 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                     if (read != -1 && !Arrays.equals(data, Constants.ERROR)) {
                         write05 = DataConvert.needSend05(data);
                         write05Index = 0;
-                        boolean result = mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
+                        boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
                         });
                         if (!result) {
-                            progressDialog.dismiss();
+                            runOnUiThread(() -> {
+                                progressDialog.dismiss();
+                                tipDialog.dismiss();
+                                Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
+                            });
                         }
                     } else {
+                        runOnUiThread(() -> {
+                            progressDialog.dismiss();
+                            tipDialog.dismiss();
+                            Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
+                        });
+                    }
+                } else {
+                    runOnUiThread(() -> {
                         progressDialog.dismiss();
                         tipDialog.dismiss();
                         Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
-                    }
-                } else {
+                    });
                     progressDialog.dismiss();
                     tipDialog.dismiss();
-                    Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                progressDialog.dismiss();
-                tipDialog.dismiss();
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+                runOnUiThread(() -> {
+                    progressDialog.dismiss();
+                    tipDialog.dismiss();
+                    Toast.makeText(LockActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+
             }
         });
     }
