@@ -317,6 +317,15 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                     });
                                 }
                             }
+                        } else {
+                            runOnUiThread(() -> {
+                                autoConnectHandler.removeMessages(0);
+                                BaseApp.mBle.cancelNotify(mBleDevice);
+
+                                progressDialog.dismiss();
+                                tipDialog.dismiss();
+                                Toast.makeText(LockActivity.this, "上行验证码相同,蓝牙已断开连接", Toast.LENGTH_SHORT).show();
+                            });
                         }
                     }
                 });
