@@ -270,24 +270,27 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         BaseApp.mBle.startNotify(device, new BleNotiftCallback<BleDevice>() {
             @Override
             public void onChanged(BleDevice device, BluetoothGattCharacteristic characteristic) {
-                runOnUiThread(() -> {
-                    if (characteristic != null && characteristic.getValue() != null && characteristic.getValue().length == 17) {
-
-                        TypeBean typeBean = BleUtils.newInstance().read(characteristic.getValue());
-                        if (typeBean != null) {
-                            if (Constants.READ_4 == typeBean.getType()) {
+                if (characteristic.getValue() != null && characteristic.getValue().length == 17) {
+                    TypeBean typeBean = BleUtils.newInstance().read(characteristic.getValue());
+                    if (typeBean != null) {
+                        if (Constants.READ_4 == typeBean.getType()) {
+                            runOnUiThread(() -> {
                                 if (typeBean.getLockType() == Constants.Lock0 || typeBean.getLockType() == Constants.Lock3) {
                                     if (tipDialog != null) {
                                         tipDialog.dismiss();
                                     }
                                 }
-                            } else if (Constants.READ_5 == typeBean.getType()) {
+                            });
+                        } else if (Constants.READ_5 == typeBean.getType()) {
+                            runOnUiThread(() -> {
                                 if (!typeBean.isOk() && write05Index < (write05.size() - 1)) {
                                     write05Index++;
                                     BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
                                     });
                                 }
-                            } else if (Constants.READ_6 == typeBean.getType()) {
+                            });
+                        } else if (Constants.READ_6 == typeBean.getType()) {
+                            runOnUiThread(() -> {
                                 write06.add(typeBean.getData());
                                 BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00), characteristic1 -> {
                                 });
@@ -316,19 +319,19 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                         }
                                     });
                                 }
-                            }
-                        } else {
-                            runOnUiThread(() -> {
-                                autoConnectHandler.removeMessages(0);
-                                BaseApp.mBle.cancelNotify(mBleDevice);
-
-                                progressDialog.dismiss();
-                                tipDialog.dismiss();
-                                Toast.makeText(LockActivity.this, "上行验证码相同,蓝牙已断开连接", Toast.LENGTH_SHORT).show();
                             });
                         }
+                    } else {
+                        runOnUiThread(() -> {
+                            autoConnectHandler.removeMessages(0);
+                            BaseApp.mBle.cancelNotify(mBleDevice);
+
+                            progressDialog.dismiss();
+                            tipDialog.dismiss();
+                            Toast.makeText(LockActivity.this, "上行验证码相同,蓝牙已断开连接", Toast.LENGTH_SHORT).show();
+                        });
                     }
-                });
+                }
             }
         });
     }
