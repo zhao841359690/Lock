@@ -12,6 +12,7 @@ public class BleUtils {
     private static BleUtils bleUtils = null;
 
     private byte[] chk = new byte[4];
+    private boolean first = true;
     private List<Boolean> myUpChkList;
 
     public BleUtils() {
@@ -48,6 +49,11 @@ public class BleUtils {
     public byte[] writeConnect() {
         byte[] bytes = new byte[16];
         bytes[0] = 0x01;
+        if (first) {
+            first = false;
+        } else {
+            chk = chkUpdateDownRandom(chk);
+        }
         for (int i = 0; i < chk.length; i++) {
             bytes[i + 1] = chk[i];
         }
@@ -70,6 +76,7 @@ public class BleUtils {
     public byte[] write05(int idx, byte[] data) {
         byte[] bytes = new byte[16];
         bytes[0] = 0x05;
+        chk = chkUpdateDownRandom(chk);
         for (int i = 0; i < chk.length; i++) {
             bytes[i + 1] = chk[i];
         }
@@ -92,6 +99,7 @@ public class BleUtils {
     public byte[] write06(byte idx, byte ret) {
         byte[] bytes = new byte[16];
         bytes[0] = 0x06;
+        chk = chkUpdateDownRandom(chk);
         for (int i = 0; i < chk.length; i++) {
             bytes[i + 1] = chk[i];
         }
@@ -139,11 +147,6 @@ public class BleUtils {
         } else {
             myUpChkList = getUpChkList;
             chk = chkUpdateDownRandom(chkBytes);
-
-            //判断下行随机数相同的话,重新取一次下行随机数
-            if (DataConvert.isChkSame(chkGetDownRandom(chkBytes), chkGetDownRandom(chk))) {
-                chk = chkUpdateDownRandom(chkBytes);
-            }
 
             if (typeByte == 0x01) {
                 typeBean.setType(Constants.READ_1);
@@ -212,27 +215,6 @@ public class BleUtils {
             }
         }
         return upList;
-    }
-
-    /**
-     * 功能: 获取下行随机数
-     * 说明: 在验证码中获取下行随机数
-     *
-     * @param chkBytes 接收数据帧的验证码
-     * @return 下行随机数
-     */
-    private List<Boolean> chkGetDownRandom(byte[] chkBytes) {
-        List<Boolean> downList = new ArrayList<>(16);
-        for (int i = 0; i < 16; i++) {
-            downList.add(false);
-        }
-        BitArray bitArray = new BitArray(32, chkBytes);
-        for (int i = 0; i < 32; i++) {
-            if (i % 2 != 0) {//奇数位
-                downList.set(i / 2, bitArray.get(i));
-            }
-        }
-        return downList;
     }
 
     /**
