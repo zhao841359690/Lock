@@ -139,6 +139,12 @@ public class BleUtils {
         } else {
             myUpChkList = getUpChkList;
             chk = chkUpdateDownRandom(chkBytes);
+
+            //判断下行随机数相同的话,重新取一次下行随机数
+            if (DataConvert.isChkSame(chkGetDownRandom(chkBytes), chkGetDownRandom(chk))) {
+                chk = chkUpdateDownRandom(chkBytes);
+            }
+
             if (typeByte == 0x01) {
                 typeBean.setType(Constants.READ_1);
             } else if (typeByte == 0x04) {
@@ -206,6 +212,27 @@ public class BleUtils {
             }
         }
         return upList;
+    }
+
+    /**
+     * 功能: 获取下行随机数
+     * 说明: 在验证码中获取下行随机数
+     *
+     * @param chkBytes 接收数据帧的验证码
+     * @return 下行随机数
+     */
+    private List<Boolean> chkGetDownRandom(byte[] chkBytes) {
+        List<Boolean> downList = new ArrayList<>(16);
+        for (int i = 0; i < 16; i++) {
+            downList.add(false);
+        }
+        BitArray bitArray = new BitArray(32, chkBytes);
+        for (int i = 0; i < 32; i++) {
+            if (i % 2 != 0) {//奇数位
+                downList.set(i / 2, bitArray.get(i));
+            }
+        }
+        return downList;
     }
 
     /**
