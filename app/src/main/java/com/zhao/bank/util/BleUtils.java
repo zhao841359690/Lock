@@ -36,6 +36,8 @@ public class BleUtils {
     }
 
     public void clearData() {
+        first = true;
+
         chk = null;
         chk = new byte[4];
 

@@ -295,6 +295,13 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                 BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00), characteristic1 -> {
                                 });
                                 if (typeBean.isOk()) {
+                                    if (!socket.isConnected()) {
+                                        try {
+                                            socket.connect(new InetSocketAddress(Constants.IP, Constants.PORT));
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
                                     byte[] data = new byte[write06.size() * 10];
                                     int size = 0;
                                     for (byte[] bytes : write06) {
@@ -306,10 +313,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                     write06 = new ArrayList<>();
                                     mThreadPool.execute(() -> {
                                         try {
-                                            if (!socket.isConnected()) {
-                                                socket.connect(new InetSocketAddress(Constants.IP, Constants.PORT));
-                                            }
-
                                             outputStream = socket.getOutputStream();
 
                                             outputStream.write(data);
