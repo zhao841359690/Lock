@@ -86,9 +86,11 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private List<byte[]> write05 = new ArrayList<>();
     private int write05Index = 0;
     private boolean isSend05 = false;
-    private boolean needSend05 = false;
+
     private List<byte[]> needWrite05 = new ArrayList<>();
     private int needWrite05Index = 0;
+    private boolean needSend05 = false;
+
     private List<byte[]> write06 = new ArrayList<>();
 
     @SuppressLint("HandlerLeak")
