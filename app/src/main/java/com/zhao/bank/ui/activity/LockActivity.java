@@ -317,6 +317,29 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
                                             outputStream.write(data);
                                             outputStream.flush();
+
+                                            inputStream = socket.getInputStream();
+                                            byte[] head = new byte[2];
+                                            int readHead = inputStream.read(head);
+                                            if (readHead != -1) {
+                                                int total = 22 + (head[1] - 1) * 16;
+                                                byte[] elseData = new byte[total];
+                                                int read = inputStream.read(elseData);
+                                                byte[] data05 = new byte[total + 2];
+                                                for (int i = 0; i < data05.length; i++) {
+                                                    if (i < 2) {
+                                                        data05[i] = head[i];
+                                                    } else {
+                                                        data05[i] = elseData[i - 2];
+                                                    }
+                                                }
+                                                if (read != -1 && !Arrays.equals(data05, Constants.ERROR)) {
+                                                    write05 = DataConvert.needSend05(data05);
+                                                    write05Index = 0;
+                                                    BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
+                                                    });
+                                                }
+                                            }
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
