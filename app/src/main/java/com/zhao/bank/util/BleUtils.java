@@ -75,14 +75,22 @@ public class BleUtils {
         return writeConnect;
     }
 
-    public byte[] write05(int idx, byte[] data) {
+    public byte[] write05(int idx, List<byte[]> list) {
+        byte[] data = list.get(idx);
         byte[] bytes = new byte[16];
         bytes[0] = 0x05;
         chk = chkUpdateDownRandom(chk);
         for (int i = 0; i < chk.length; i++) {
             bytes[i + 1] = chk[i];
         }
-        bytes[5] = (byte) idx;
+        if (idx == list.size() - 1) {
+            String normal = Integer.toBinaryString(((byte) idx & 0xFF) + 0x100).substring(2);
+            String replace = "1" + normal;
+            bytes[5] = (byte) Integer.parseInt(replace, 2);
+        } else {
+            bytes[5] = (byte) idx;
+        }
+
         for (int i = 0; i < data.length; i++) {
             bytes[i + 6] = data[i];
         }

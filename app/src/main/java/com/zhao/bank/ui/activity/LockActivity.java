@@ -97,7 +97,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (!isSend05) {
-                boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(needWrite05Index, needWrite05.get(needWrite05Index)), characteristic1 -> {
+                boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(needWrite05Index, needWrite05), characteristic1 -> {
                 });
                 if (!result) {
                     needSend05 = false;
@@ -314,7 +314,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                 if (isSend05) {
                                     if (!typeBean.isOk() && write05Index < (write05.size() - 1)) {
                                         write05Index++;
-                                        boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
+                                        boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05), characteristic1 -> {
                                         });
                                         if (!result) {
                                             isSend05 = false;
@@ -325,7 +325,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                 } else {
                                     if (!typeBean.isOk() && needWrite05Index < (needWrite05.size() - 1)) {
                                         needWrite05Index++;
-                                        boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(needWrite05Index, needWrite05.get(needWrite05Index)), characteristic1 -> {
+                                        boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(needWrite05Index, needWrite05), characteristic1 -> {
                                         });
                                         if (!result) {
                                             needSend05 = false;
@@ -380,12 +380,14 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                                     }
                                                 }
                                                 if (read != -1 && !Arrays.equals(data05, Constants.ERROR)) {
-                                                    needSend05 = true;
-                                                    needWrite05 = DataConvert.needSend05(data05);
-                                                    needWrite05Index = 0;
+                                                    runOnUiThread(() -> {
+                                                        needSend05 = true;
+                                                        needWrite05 = DataConvert.needSend05(data05);
+                                                        needWrite05Index = 0;
 
-                                                    send05Handler.removeMessages(0);
-                                                    send05Handler.sendEmptyMessage(0);
+                                                        send05Handler.removeMessages(0);
+                                                        send05Handler.sendEmptyMessage(0);
+                                                    });
                                                 } else {
                                                     needSend05 = false;
                                                 }
@@ -448,7 +450,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         isSend05 = true;
                         write05 = DataConvert.needSend05(data);
                         write05Index = 0;
-                        boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
+                        boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05), characteristic1 -> {
                         });
                         if (!result) {
                             runOnUiThread(() -> {
