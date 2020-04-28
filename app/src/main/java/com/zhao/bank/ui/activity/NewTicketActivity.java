@@ -139,16 +139,14 @@ public class NewTicketActivity extends BaseActivity {
                 }
                 break;
             case R.id.cash_drawer_number_iv:
-                Toast.makeText(this, "暂无此功能", Toast.LENGTH_SHORT).show();
-//                intent = new Intent(this, ScanCodeActivity.class);
-//                intent.putExtra("fromWhere", Constants.CASH_DRAWER_NUMBER);
-//                startActivityForResult(intent, Constants.CASH_DRAWER_NUMBER);
+                intent = new Intent(this, ScanCodeActivity.class);
+                intent.putExtra("fromWhere", Constants.CASH_DRAWER_NUMBER);
+                startActivityForResult(intent, Constants.CASH_DRAWER_NUMBER);
                 break;
             case R.id.lock_body_number_iv:
-                Toast.makeText(this, "暂无此功能", Toast.LENGTH_SHORT).show();
-//                intent = new Intent(this, ScanCodeActivity.class);
-//                intent.putExtra("fromWhere", Constants.LOCK_BODY_NUMBER);
-//                startActivityForResult(intent, Constants.LOCK_BODY_NUMBER);
+                intent = new Intent(this, ScanCodeActivity.class);
+                intent.putExtra("fromWhere", Constants.LOCK_BODY_NUMBER);
+                startActivityForResult(intent, Constants.LOCK_BODY_NUMBER);
                 break;
             case R.id.start_time_ly:
                 timePickerView.setDate(Calendar.getInstance());
