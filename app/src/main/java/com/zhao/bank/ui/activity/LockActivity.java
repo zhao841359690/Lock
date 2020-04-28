@@ -386,7 +386,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                                         needWrite05Index = 0;
 
                                                         send05Handler.removeMessages(0);
-                                                        send05Handler.sendEmptyMessage(0);
+                                                        send05Handler.sendEmptyMessageDelayed(0, 1000);
                                                     });
                                                 } else {
                                                     needSend05 = false;
