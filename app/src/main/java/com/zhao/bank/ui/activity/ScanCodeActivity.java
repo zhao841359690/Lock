@@ -95,7 +95,6 @@ public class ScanCodeActivity extends BaseActivity implements OnCaptureCallback 
             Intent intent = new Intent();
             intent.putExtra("result", result);
             setResult(fromWhere, intent);
-            return false;
         } else {
             RxHttp.get("/app/todoOrders")
                     .add("token", SharedPreferencesUtils.getInstance().getToken())
@@ -137,7 +136,7 @@ public class ScanCodeActivity extends BaseActivity implements OnCaptureCallback 
                         Toast.makeText(BaseApp.getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                         finish();
                     });
-            return true;
         }
+        return true;
     }
 }
