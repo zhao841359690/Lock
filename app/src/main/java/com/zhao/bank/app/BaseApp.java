@@ -6,11 +6,9 @@ import android.content.Context;
 import java.util.UUID;
 
 import cn.com.heaton.blelibrary.ble.Ble;
-import cn.com.heaton.blelibrary.ble.model.BleDevice;
 
 public class BaseApp extends Application {
     private static Context context;
-    public static Ble<BleDevice> mBle;
 
     @Override
     public void onCreate() {
@@ -20,18 +18,12 @@ public class BaseApp extends Application {
         initBle();
     }
 
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
-        mBle.destory(this);
-    }
-
     public static Context getContext() {
         return context;
     }
 
     private void initBle() {
-        mBle = Ble.options()//开启配置
+        Ble.options()//开启配置
                 .setLogBleExceptions(true)//设置是否输出打印蓝牙日志（非正式打包请设置为true，以便于调试）
                 .setThrowBleException(true)//设置是否抛出蓝牙异常
                 .setAutoConnect(false)//设置是否自动连接

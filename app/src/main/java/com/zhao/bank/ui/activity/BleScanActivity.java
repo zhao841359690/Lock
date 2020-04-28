@@ -87,7 +87,7 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
     @SuppressLint("CheckResult")
     @Override
     public void onItemClick(BleBean bleBean) {
-        BaseApp.mBle.stopScan();
+        Ble.getInstance().stopScan();
         RxHttp.get("/app/todoOrders")
                 .add("token", SharedPreferencesUtils.getInstance().getToken())
                 .asClass(TodoOrdersBean.class)
@@ -129,17 +129,17 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
 
 
     private void scan() {
-        if (!BaseApp.mBle.isSupportBle(BaseApp.getContext())) {
+        if (!Ble.getInstance().isSupportBle(BaseApp.getContext())) {
             Toast.makeText(BaseApp.getContext(), "BLE is not supported", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (!BaseApp.mBle.isBleEnable()) {
+        if (!Ble.getInstance().isBleEnable()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, Ble.REQUEST_ENABLE_BT);
             return;
         }
 
-        BaseApp.mBle.startScan(new BleScanCallback<BleDevice>() {
+        Ble.getInstance().startScan(new BleScanCallback<BleDevice>() {
             @Override
             public void onStart() {
                 super.onStart();

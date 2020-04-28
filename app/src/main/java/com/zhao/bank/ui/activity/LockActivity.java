@@ -39,6 +39,7 @@ import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import cn.com.heaton.blelibrary.ble.Ble;
 import cn.com.heaton.blelibrary.ble.callback.BleConnectCallback;
 import cn.com.heaton.blelibrary.ble.callback.BleNotiftCallback;
 import cn.com.heaton.blelibrary.ble.model.BleDevice;
@@ -99,7 +100,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (!isSend05) {
-                boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(needWrite05Index, needWrite05), characteristic1 -> {
+                boolean result = Ble.getInstance().write(mBleDevice, BleUtils.newInstance().write05(needWrite05Index, needWrite05), characteristic1 -> {
                 });
                 if (!result) {
                     needSend05 = false;
@@ -116,7 +117,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), characteristic -> {
+            Ble.getInstance().write(mBleDevice, BleUtils.newInstance().writeConnect(), characteristic -> {
                 autoConnectHandler.removeMessages(0);
                 autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
             });
@@ -128,7 +129,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().writeConnect(), characteristic -> {
+            boolean result = Ble.getInstance().write(mBleDevice, BleUtils.newInstance().writeConnect(), characteristic -> {
                 progressDialog.dismiss();
                 tipDialog.show();
 
@@ -157,8 +158,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
         tipDialog = new TipDialog(this, this);
         tipDialog.setOnDismissListener(dialogInterface -> {
-            if (BaseApp.mBle != null && mBleDevice != null) {
-                BaseApp.mBle.disconnect(mBleDevice);
+            if (Ble.getInstance() != null && mBleDevice != null) {
+                Ble.getInstance().disconnect(mBleDevice);
+                Ble.getInstance().refreshDeviceCache(address.toUpperCase());
             }
         });
 
@@ -234,8 +236,11 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
             case R.id.lock_ly:
                 progressDialog.setMessage("蓝牙连接中...");
                 progressDialog.show();
+
                 BleUtils.newInstance().clearData();
-                BaseApp.mBle.connect(address.toUpperCase(), connectCallback);
+
+                Ble.getInstance().refreshDeviceCache(address.toUpperCase());
+                Ble.getInstance().connect(address.toUpperCase(), connectCallback);
                 break;
         }
     }
@@ -297,7 +302,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     };
 
     private void setNotify(BleDevice device) {
-        BaseApp.mBle.startNotify(device, new BleNotiftCallback<BleDevice>() {
+        Ble.getInstance().startNotify(device, new BleNotiftCallback<BleDevice>() {
             @Override
             public void onChanged(BleDevice device, BluetoothGattCharacteristic characteristic) {
                 if (characteristic.getValue() != null && characteristic.getValue().length == 17) {
@@ -316,7 +321,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                 if (isSend05) {
                                     if (!typeBean.isOk() && write05Index < (write05.size() - 1)) {
                                         write05Index++;
-                                        boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05), characteristic1 -> {
+                                        boolean result = Ble.getInstance().write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05), characteristic1 -> {
                                         });
                                         if (!result) {
                                             isSend05 = false;
@@ -327,7 +332,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                 } else {
                                     if (!typeBean.isOk() && needWrite05Index < (needWrite05.size() - 1)) {
                                         needWrite05Index++;
-                                        boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(needWrite05Index, needWrite05), characteristic1 -> {
+                                        boolean result = Ble.getInstance().write(mBleDevice, BleUtils.newInstance().write05(needWrite05Index, needWrite05), characteristic1 -> {
                                         });
                                         if (!result) {
                                             needSend05 = false;
@@ -340,7 +345,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         } else if (Constants.READ_6 == typeBean.getType()) {
                             runOnUiThread(() -> {
                                 write06.add(typeBean.getData());
-                                BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00), characteristic1 -> {
+                                Ble.getInstance().write(mBleDevice, BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00), characteristic1 -> {
                                 });
                                 if (typeBean.isOk()) {
                                     if (!socket.isConnected()) {
@@ -406,7 +411,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                     } else {
                         runOnUiThread(() -> {
                             autoConnectHandler.removeMessages(0);
-                            BaseApp.mBle.cancelNotify(mBleDevice);
+                            Ble.getInstance().cancelNotify(mBleDevice);
 
                             progressDialog.dismiss();
                             tipDialog.dismiss();
@@ -452,7 +457,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         isSend05 = true;
                         write05 = DataConvert.needSend05(data);
                         write05Index = 0;
-                        boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05), characteristic1 -> {
+                        boolean result = Ble.getInstance().write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05), characteristic1 -> {
                         });
                         if (!result) {
                             runOnUiThread(() -> {
