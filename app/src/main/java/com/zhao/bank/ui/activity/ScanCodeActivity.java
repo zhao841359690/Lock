@@ -107,7 +107,7 @@ public class ScanCodeActivity extends BaseActivity implements OnCaptureCallback 
                                 List<TodoOrdersBean.DataBean> dataBeanList = new ArrayList<>();
 
                                 for (TodoOrdersBean.DataBean datum : todoOrdersBean.getData()) {
-                                    if (datum.getLock().getHexUid().equals(result)) {
+                                    if (datum.getLock().getBleMac().equals(result)) {
                                         canFind = true;
                                         dataBeanList.add(datum);
                                     }
