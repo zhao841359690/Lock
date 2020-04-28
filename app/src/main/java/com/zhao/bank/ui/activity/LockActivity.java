@@ -85,7 +85,29 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
     private List<byte[]> write05 = new ArrayList<>();
     private int write05Index = 0;
+    private boolean isSend05 = false;
+    private boolean needSend05 = false;
+    private List<byte[]> needWrite05 = new ArrayList<>();
+    private int needWrite05Index = 0;
     private List<byte[]> write06 = new ArrayList<>();
+
+    @SuppressLint("HandlerLeak")
+    private Handler send05Handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (!isSend05) {
+                boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(needWrite05Index, needWrite05.get(needWrite05Index)), characteristic1 -> {
+                });
+                if (!result) {
+                    needSend05 = false;
+                }
+            } else {
+                send05Handler.removeMessages(0);
+                send05Handler.sendEmptyMessageDelayed(0, 1000);
+            }
+        }
+    };
 
     @SuppressLint("HandlerLeak")
     private Handler autoConnectHandler = new Handler() {
@@ -198,6 +220,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         }
         handler.removeMessages(0);
         autoConnectHandler.removeMessages(0);
+        send05Handler.removeMessages(0);
     }
 
     @OnClick({R.id.title_left_rl, R.id.lock_ly})
@@ -218,6 +241,11 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     @Override
     public void onOpenCloseClick(int type) {
         if (mBleDevice == null || !mBleDevice.isConnected()) {
+            return;
+        }
+
+        if (needSend05) {
+            Toast.makeText(this, "正在发送数据，请稍后点击", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -283,10 +311,28 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                             });
                         } else if (Constants.READ_5 == typeBean.getType()) {
                             runOnUiThread(() -> {
-                                if (!typeBean.isOk() && write05Index < (write05.size() - 1)) {
-                                    write05Index++;
-                                    BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
-                                    });
+                                if (isSend05) {
+                                    if (!typeBean.isOk() && write05Index < (write05.size() - 1)) {
+                                        write05Index++;
+                                        boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
+                                        });
+                                        if (!result) {
+                                            isSend05 = false;
+                                        }
+                                    } else {
+                                        isSend05 = false;
+                                    }
+                                } else {
+                                    if (!typeBean.isOk() && needWrite05Index < (needWrite05.size() - 1)) {
+                                        needWrite05Index++;
+                                        boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(needWrite05Index, needWrite05.get(needWrite05Index)), characteristic1 -> {
+                                        });
+                                        if (!result) {
+                                            needSend05 = false;
+                                        }
+                                    } else {
+                                        needSend05 = false;
+                                    }
                                 }
                             });
                         } else if (Constants.READ_6 == typeBean.getType()) {
@@ -334,11 +380,17 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                                     }
                                                 }
                                                 if (read != -1 && !Arrays.equals(data05, Constants.ERROR)) {
-                                                    write05 = DataConvert.needSend05(data05);
-                                                    write05Index = 0;
-                                                    BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
-                                                    });
+                                                    needSend05 = true;
+                                                    needWrite05 = DataConvert.needSend05(data05);
+                                                    needWrite05Index = 0;
+
+                                                    send05Handler.removeMessages(0);
+                                                    send05Handler.sendEmptyMessage(0);
+                                                } else {
+                                                    needSend05 = false;
                                                 }
+                                            } else {
+                                                needSend05 = false;
                                             }
                                         } catch (IOException e) {
                                             e.printStackTrace();
@@ -393,12 +445,14 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         }
                     }
                     if (read != -1 && !Arrays.equals(data, Constants.ERROR)) {
+                        isSend05 = true;
                         write05 = DataConvert.needSend05(data);
                         write05Index = 0;
                         boolean result = BaseApp.mBle.write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05.get(write05Index)), characteristic1 -> {
                         });
                         if (!result) {
                             runOnUiThread(() -> {
+                                isSend05 = false;
                                 progressDialog.dismiss();
                                 tipDialog.dismiss();
                                 Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
@@ -406,6 +460,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         }
                     } else {
                         runOnUiThread(() -> {
+                            isSend05 = false;
                             progressDialog.dismiss();
                             tipDialog.dismiss();
                             Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
@@ -413,12 +468,11 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                     }
                 } else {
                     runOnUiThread(() -> {
+                        isSend05 = false;
                         progressDialog.dismiss();
                         tipDialog.dismiss();
                         Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
                     });
-                    progressDialog.dismiss();
-                    tipDialog.dismiss();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
