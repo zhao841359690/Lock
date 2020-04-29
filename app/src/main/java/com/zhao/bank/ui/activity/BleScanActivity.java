@@ -11,12 +11,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clj.fastble.BleManager;
+import com.clj.fastble.callback.BleScanCallback;
+import com.clj.fastble.data.BleDevice;
 import com.zhao.bank.R;
 
 import com.zhao.bank.app.BaseApp;
 import com.zhao.bank.base.BaseActivity;
 
-import com.zhao.bank.bean.BleBean;
 import com.zhao.bank.bean.TodoOrdersBean;
 import com.zhao.bank.ui.adapter.BleScanAdapter;
 import com.zhao.bank.util.SharedPreferencesUtils;
@@ -27,9 +29,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import cn.com.heaton.blelibrary.ble.Ble;
-import cn.com.heaton.blelibrary.ble.callback.BleScanCallback;
-import cn.com.heaton.blelibrary.ble.model.BleDevice;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import rxhttp.wrapper.param.RxHttp;
 
@@ -44,7 +43,7 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
     RecyclerView mRecyclerView;
 
     private BleScanAdapter mAdapter;
-    private List<BleBean> bleBeanList = new ArrayList<>();
+    private List<BleDevice> bleDeviceList = new ArrayList<>();
 
     @Override
     protected int getLayoutId() {
@@ -86,8 +85,8 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
 
     @SuppressLint("CheckResult")
     @Override
-    public void onItemClick(BleBean bleBean) {
-        Ble.getInstance().stopScan();
+    public void onItemClick(BleDevice bleDevice) {
+        BleManager.getInstance().cancelScan();
         RxHttp.get("/app/todoOrders")
                 .add("token", SharedPreferencesUtils.getInstance().getToken())
                 .asClass(TodoOrdersBean.class)
@@ -99,7 +98,7 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
                             List<TodoOrdersBean.DataBean> dataBeanList = new ArrayList<>();
 
                             for (TodoOrdersBean.DataBean datum : todoOrdersBean.getData()) {
-                                if (datum.getLock().getBleMac().equals(bleBean.getBleDevice().getBleAddress().toLowerCase())) {
+                                if (datum.getLock().getBleMac().equals(bleDevice.getMac().toLowerCase())) {
                                     canFind = true;
                                     dataBeanList.add(datum);
                                 }
@@ -129,46 +128,42 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
 
 
     private void scan() {
-        if (!Ble.getInstance().isSupportBle(BaseApp.getContext())) {
+        if (!BleManager.getInstance().isSupportBle()) {
             Toast.makeText(BaseApp.getContext(), "BLE is not supported", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (!Ble.getInstance().isBleEnable()) {
+
+        if (!BleManager.getInstance().isBlueEnable()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, Ble.REQUEST_ENABLE_BT);
+            startActivityForResult(enableBtIntent, 0x01);
             return;
         }
 
-        Ble.getInstance().startScan(new BleScanCallback<BleDevice>() {
+        BleManager.getInstance().scan(new BleScanCallback() {
             @Override
-            public void onStart() {
-                super.onStart();
+            public void onScanFinished(List<BleDevice> scanResultList) {
+                if (bleDeviceList.size() == 0) {
+                    retryTv.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onScanStarted(boolean success) {
                 retryTv.setVisibility(View.GONE);
             }
 
             @Override
-            public void onLeScan(BleDevice device, int rssi, byte[] scanRecord) {
-                if (TextUtils.isEmpty(device.getBleName())) {
+            public void onScanning(BleDevice bleDevice) {
+                if (TextUtils.isEmpty(bleDevice.getName())) {
                     return;
                 }
-                for (BleBean bleBean : bleBeanList) {
-                    if (bleBean.getBleDevice().getBleAddress().equals(device.getBleAddress())) {
+                for (BleDevice device : bleDeviceList) {
+                    if (device.getMac().equals(bleDevice.getMac())) {
                         return;
                     }
                 }
-                BleBean bleBean = new BleBean();
-                bleBean.setBleDevice(device);
-                bleBean.setRssi(rssi);
-                bleBeanList.add(bleBean);
-                mAdapter.setBleBeanList(bleBeanList);
-            }
-
-            @Override
-            public void onStop() {
-                super.onStop();
-                if (bleBeanList.size() == 0) {
-                    retryTv.setVisibility(View.VISIBLE);
-                }
+                bleDeviceList.add(bleDevice);
+                mAdapter.setBleBeanList(bleDeviceList);
             }
         });
     }

@@ -2,6 +2,7 @@ package com.zhao.bank.ui.activity;
 
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.Handler;
 import android.os.Message;
@@ -13,8 +14,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.clj.fastble.BleManager;
+import com.clj.fastble.callback.BleGattCallback;
+import com.clj.fastble.callback.BleNotifyCallback;
+import com.clj.fastble.callback.BleWriteCallback;
+import com.clj.fastble.data.BleDevice;
+import com.clj.fastble.exception.BleException;
 import com.zhao.bank.R;
-import com.zhao.bank.app.BaseApp;
 import com.zhao.bank.base.BaseActivity;
 import com.zhao.bank.bean.TodoOrdersBean;
 import com.zhao.bank.bean.TypeBean;
@@ -39,10 +45,6 @@ import java.util.concurrent.Executors;
 
 import butterknife.BindView;
 import butterknife.OnClick;
-import cn.com.heaton.blelibrary.ble.Ble;
-import cn.com.heaton.blelibrary.ble.callback.BleConnectCallback;
-import cn.com.heaton.blelibrary.ble.callback.BleNotiftCallback;
-import cn.com.heaton.blelibrary.ble.model.BleDevice;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import rxhttp.wrapper.param.RxHttp;
 
@@ -100,11 +102,21 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (!isSend05) {
-                boolean result = Ble.getInstance().write(mBleDevice, BleUtils.newInstance().write05(needWrite05Index, needWrite05), characteristic1 -> {
-                });
-                if (!result) {
-                    needSend05 = false;
-                }
+                BleManager.getInstance().write(mBleDevice,
+                        Constants.UUID_SERVICE,
+                        Constants.UUID_WRITE_CHA,
+                        BleUtils.newInstance().write05(needWrite05Index, needWrite05),
+                        new BleWriteCallback() {
+                            @Override
+                            public void onWriteSuccess(int current, int total, byte[] justWrite) {
+
+                            }
+
+                            @Override
+                            public void onWriteFailure(BleException exception) {
+                                needSend05 = false;
+                            }
+                        });
             } else {
                 send05Handler.removeMessages(0);
                 send05Handler.sendEmptyMessageDelayed(0, 1000);
@@ -117,10 +129,23 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            Ble.getInstance().write(mBleDevice, BleUtils.newInstance().writeConnect(), characteristic -> {
-                autoConnectHandler.removeMessages(0);
-                autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
-            });
+            BleManager.getInstance().write(mBleDevice,
+                    Constants.UUID_SERVICE,
+                    Constants.UUID_WRITE_CHA,
+                    BleUtils.newInstance().writeConnect(),
+                    new BleWriteCallback() {
+                        @Override
+                        public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                            autoConnectHandler.removeMessages(0);
+                            autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
+                        }
+
+                        @Override
+                        public void onWriteFailure(BleException exception) {
+                            autoConnectHandler.removeMessages(0);
+                            autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
+                        }
+                    });
         }
     };
 
@@ -129,18 +154,26 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            boolean result = Ble.getInstance().write(mBleDevice, BleUtils.newInstance().writeConnect(), characteristic -> {
-                progressDialog.dismiss();
-                tipDialog.show();
+            BleManager.getInstance().write(mBleDevice,
+                    Constants.UUID_SERVICE,
+                    Constants.UUID_WRITE_CHA,
+                    BleUtils.newInstance().writeConnect(),
+                    new BleWriteCallback() {
+                        @Override
+                        public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                            progressDialog.dismiss();
+                            tipDialog.show();
 
-                autoConnectHandler.removeMessages(0);
-                autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
-            });
+                            autoConnectHandler.removeMessages(0);
+                            autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
+                        }
 
-            if (!result) {
-                progressDialog.dismiss();
-                Toast.makeText(LockActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
-            }
+                        @Override
+                        public void onWriteFailure(BleException exception) {
+                            progressDialog.dismiss();
+                            Toast.makeText(LockActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         }
     };
 
@@ -158,9 +191,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
         tipDialog = new TipDialog(this, this);
         tipDialog.setOnDismissListener(dialogInterface -> {
-            if (Ble.getInstance() != null && mBleDevice != null) {
-                Ble.getInstance().disconnect(mBleDevice);
-                Ble.getInstance().refreshDeviceCache(address.toUpperCase());
+            if (mBleDevice != null) {
+                BleManager.getInstance().disconnect(mBleDevice);
             }
         });
 
@@ -243,15 +275,14 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 autoConnectHandler.removeMessages(0);
                 send05Handler.removeMessages(0);
 
-                Ble.getInstance().refreshDeviceCache(address.toUpperCase());
-                Ble.getInstance().connect(address.toUpperCase(), connectCallback);
+                BleManager.getInstance().connect(address.toUpperCase(), bleGattCallback);
                 break;
         }
     }
 
     @Override
     public void onOpenCloseClick(int type) {
-        if (mBleDevice == null || !mBleDevice.isConnected()) {
+        if (mBleDevice == null) {
             return;
         }
 
@@ -280,151 +311,195 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         });
     }
 
-    private BleConnectCallback<BleDevice> connectCallback = new BleConnectCallback<BleDevice>() {
+    private BleGattCallback bleGattCallback = new BleGattCallback() {
         @Override
-        public void onConnectionChanged(BleDevice device) {
-            if (device.isConnected()) {
-                mBleDevice = device;
-                setNotify(device);
-                handler.sendEmptyMessageDelayed(0, 2000);
-            }
+        public void onStartConnect() {
+
         }
 
         @Override
-        public void onConnectException(BleDevice device, int errorCode) {
-            super.onConnectException(device, errorCode);
+        public void onConnectFail(BleDevice bleDevice, BleException exception) {
             progressDialog.dismiss();
-            Toast.makeText(LockActivity.this, "连接异常，异常状态码:" + errorCode, Toast.LENGTH_SHORT).show();
+            Toast.makeText(LockActivity.this, "连接异常，异常状态码:" + exception.getCode(), Toast.LENGTH_SHORT).show();
         }
 
         @Override
-        public void onConnectTimeOut(BleDevice device) {
-            super.onConnectTimeOut(device);
-            progressDialog.dismiss();
-            Toast.makeText(LockActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
+        public void onConnectSuccess(BleDevice bleDevice, BluetoothGatt gatt, int status) {
+            mBleDevice = bleDevice;
+            setNotify(bleDevice);
+            handler.sendEmptyMessageDelayed(0, 2000);
+        }
+
+        @Override
+        public void onDisConnected(boolean isActiveDisConnected, BleDevice device, BluetoothGatt gatt, int status) {
+
         }
     };
 
     private void setNotify(BleDevice device) {
-        Ble.getInstance().startNotify(device, new BleNotiftCallback<BleDevice>() {
-            @Override
-            public void onChanged(BleDevice device, BluetoothGattCharacteristic characteristic) {
-                if (characteristic.getValue() != null && characteristic.getValue().length == 17) {
-                    TypeBean typeBean = BleUtils.newInstance().read(characteristic.getValue());
-                    if (typeBean != null) {
-                        if (Constants.READ_4 == typeBean.getType()) {
-                            runOnUiThread(() -> {
-                                if (typeBean.getLockType() == Constants.Lock0 || typeBean.getLockType() == Constants.Lock3) {
-                                    if (tipDialog != null) {
-                                        tipDialog.dismiss();
+        BleManager.getInstance().notify(device,
+                Constants.UUID_SERVICE,
+                Constants.UUID_NOTIFY,
+                new BleNotifyCallback() {
+                    @Override
+                    public void onNotifySuccess() {
+
+                    }
+
+                    @Override
+                    public void onNotifyFailure(BleException exception) {
+
+                    }
+
+                    @Override
+                    public void onCharacteristicChanged(byte[] characteristic) {
+                        if (characteristic != null && characteristic.length == 17) {
+                            TypeBean typeBean = BleUtils.newInstance().read(characteristic);
+                            if (typeBean != null) {
+                                if (Constants.READ_4 == typeBean.getType()) {
+                                    if (typeBean.getLockType() == Constants.Lock0 || typeBean.getLockType() == Constants.Lock3) {
+                                        if (tipDialog != null) {
+                                            tipDialog.dismiss();
+                                        }
                                     }
-                                }
-                            });
-                        } else if (Constants.READ_5 == typeBean.getType()) {
-                            runOnUiThread(() -> {
-                                if (isSend05) {
-                                    if (!typeBean.isOk() && write05Index < (write05.size() - 1)) {
-                                        write05Index++;
-                                        boolean result = Ble.getInstance().write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05), characteristic1 -> {
-                                        });
-                                        if (!result) {
+                                } else if (Constants.READ_5 == typeBean.getType()) {
+                                    if (isSend05) {
+                                        if (!typeBean.isOk() && write05Index < (write05.size() - 1)) {
+                                            write05Index++;
+                                            BleManager.getInstance().write(mBleDevice,
+                                                    Constants.UUID_SERVICE,
+                                                    Constants.UUID_WRITE_CHA,
+                                                    BleUtils.newInstance().write05(write05Index, write05),
+                                                    new BleWriteCallback() {
+                                                        @Override
+                                                        public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                                                            autoConnectHandler.removeMessages(0);
+                                                            autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
+                                                        }
+
+                                                        @Override
+                                                        public void onWriteFailure(BleException exception) {
+                                                            isSend05 = false;
+                                                        }
+                                                    });
+                                        } else {
                                             isSend05 = false;
                                         }
                                     } else {
-                                        isSend05 = false;
-                                    }
-                                } else {
-                                    if (!typeBean.isOk() && needWrite05Index < (needWrite05.size() - 1)) {
-                                        needWrite05Index++;
-                                        boolean result = Ble.getInstance().write(mBleDevice, BleUtils.newInstance().write05(needWrite05Index, needWrite05), characteristic1 -> {
-                                        });
-                                        if (!result) {
+                                        if (!typeBean.isOk() && needWrite05Index < (needWrite05.size() - 1)) {
+                                            needWrite05Index++;
+                                            BleManager.getInstance().write(mBleDevice,
+                                                    Constants.UUID_SERVICE,
+                                                    Constants.UUID_WRITE_CHA,
+                                                    BleUtils.newInstance().write05(needWrite05Index, needWrite05),
+                                                    new BleWriteCallback() {
+                                                        @Override
+                                                        public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                                                        }
+
+                                                        @Override
+                                                        public void onWriteFailure(BleException exception) {
+                                                            needSend05 = false;
+                                                        }
+                                                    });
+                                        } else {
                                             needSend05 = false;
                                         }
-                                    } else {
-                                        needSend05 = false;
                                     }
-                                }
-                            });
-                        } else if (Constants.READ_6 == typeBean.getType()) {
-                            runOnUiThread(() -> {
-                                write06.add(typeBean.getData());
-                                Ble.getInstance().write(mBleDevice, BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00), characteristic1 -> {
-                                });
-                                if (typeBean.isOk()) {
-                                    if (!socket.isConnected()) {
-                                        try {
-                                            socket.connect(new InetSocketAddress(Constants.IP, Constants.PORT));
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                    byte[] data = new byte[write06.size() * 10];
-                                    int size = 0;
-                                    for (byte[] bytes : write06) {
-                                        for (int i = 0; i < bytes.length; i++) {
-                                            data[size + i] = bytes[i];
-                                        }
-                                        size += bytes.length;
-                                    }
-                                    write06 = new ArrayList<>();
-                                    mThreadPool.execute(() -> {
-                                        try {
-                                            outputStream = socket.getOutputStream();
-
-                                            outputStream.write(data);
-                                            outputStream.flush();
-
-                                            inputStream = socket.getInputStream();
-                                            byte[] head = new byte[2];
-                                            int readHead = inputStream.read(head);
-                                            if (readHead != -1) {
-                                                int total = 22 + (head[1] - 1) * 16;
-                                                byte[] elseData = new byte[total];
-                                                int read = inputStream.read(elseData);
-                                                byte[] data05 = new byte[total + 2];
-                                                for (int i = 0; i < data05.length; i++) {
-                                                    if (i < 2) {
-                                                        data05[i] = head[i];
-                                                    } else {
-                                                        data05[i] = elseData[i - 2];
+                                } else if (Constants.READ_6 == typeBean.getType()) {
+                                    runOnUiThread(() -> {
+                                        write06.add(typeBean.getData());
+                                        BleManager.getInstance().write(
+                                                mBleDevice,
+                                                Constants.UUID_SERVICE,
+                                                Constants.UUID_WRITE_CHA,
+                                                BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00),
+                                                new BleWriteCallback() {
+                                                    @Override
+                                                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
                                                     }
-                                                }
-                                                if (read != -1 && !Arrays.equals(data05, Constants.ERROR)) {
-                                                    runOnUiThread(() -> {
-                                                        needSend05 = true;
-                                                        needWrite05 = DataConvert.needSend05(data05);
-                                                        needWrite05Index = 0;
 
-                                                        send05Handler.removeMessages(0);
-                                                        send05Handler.sendEmptyMessageDelayed(0, 1000);
-                                                    });
-                                                } else {
-                                                    needSend05 = false;
+                                                    @Override
+                                                    public void onWriteFailure(BleException exception) {
+                                                    }
+                                                });
+                                        if (typeBean.isOk()) {
+                                            if (!socket.isConnected()) {
+                                                try {
+                                                    socket.connect(new InetSocketAddress(Constants.IP, Constants.PORT));
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
                                                 }
-                                            } else {
-                                                needSend05 = false;
                                             }
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
+                                            byte[] data = new byte[write06.size() * 10];
+                                            int size = 0;
+                                            for (byte[] bytes : write06) {
+                                                for (int i = 0; i < bytes.length; i++) {
+                                                    data[size + i] = bytes[i];
+                                                }
+                                                size += bytes.length;
+                                            }
+                                            write06 = new ArrayList<>();
+                                            mThreadPool.execute(() -> {
+                                                try {
+                                                    outputStream = socket.getOutputStream();
+
+                                                    outputStream.write(data);
+                                                    outputStream.flush();
+
+                                                    inputStream = socket.getInputStream();
+                                                    byte[] head = new byte[2];
+                                                    int readHead = inputStream.read(head);
+                                                    if (readHead != -1) {
+                                                        int total = 22 + (head[1] - 1) * 16;
+                                                        byte[] elseData = new byte[total];
+                                                        int read = inputStream.read(elseData);
+                                                        byte[] data05 = new byte[total + 2];
+                                                        for (int i = 0; i < data05.length; i++) {
+                                                            if (i < 2) {
+                                                                data05[i] = head[i];
+                                                            } else {
+                                                                data05[i] = elseData[i - 2];
+                                                            }
+                                                        }
+                                                        if (read != -1 && !Arrays.equals(data05, Constants.ERROR)) {
+                                                            runOnUiThread(() -> {
+                                                                needSend05 = true;
+                                                                needWrite05 = DataConvert.needSend05(data05);
+                                                                needWrite05Index = 0;
+
+                                                                send05Handler.removeMessages(0);
+                                                                send05Handler.sendEmptyMessageDelayed(0, 1000);
+                                                            });
+                                                        } else {
+                                                            needSend05 = false;
+                                                        }
+                                                    } else {
+                                                        needSend05 = false;
+                                                    }
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            });
                                         }
                                     });
                                 }
-                            });
-                        }
-                    } else {
-                        runOnUiThread(() -> {
-                            autoConnectHandler.removeMessages(0);
-                            Ble.getInstance().cancelNotify(mBleDevice);
+                            } else {
+                                runOnUiThread(() -> {
+                                    autoConnectHandler.removeMessages(0);
+                                    BleManager.getInstance().stopNotify(mBleDevice,
+                                            Constants.UUID_SERVICE,
+                                            Constants.UUID_NOTIFY);
 
-                            progressDialog.dismiss();
-                            tipDialog.dismiss();
-                            Toast.makeText(LockActivity.this, "上行验证码相同,蓝牙已断开连接", Toast.LENGTH_SHORT).show();
-                        });
+                                    progressDialog.dismiss();
+                                    tipDialog.dismiss();
+                                    Toast.makeText(LockActivity.this, "上行验证码相同,蓝牙已断开连接", Toast.LENGTH_SHORT).show();
+                                });
+                            }
+                        }
+
                     }
-                }
-            }
-        });
+                });
     }
 
     private void openOrClose(boolean openOrClose) {
@@ -461,16 +536,28 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         isSend05 = true;
                         write05 = DataConvert.needSend05(data);
                         write05Index = 0;
-                        boolean result = Ble.getInstance().write(mBleDevice, BleUtils.newInstance().write05(write05Index, write05), characteristic1 -> {
-                        });
-                        if (!result) {
-                            runOnUiThread(() -> {
-                                isSend05 = false;
-                                progressDialog.dismiss();
-                                tipDialog.dismiss();
-                                Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
-                            });
-                        }
+                        BleManager.getInstance().write(
+                                mBleDevice,
+                                "0000ffe0-0000-1000-8000-00805f9b34fb",
+                                "0000ffe1-0000-1000-8000-00805f9b34fb",
+                                BleUtils.newInstance().write05(write05Index, write05),
+                                new BleWriteCallback() {
+                                    @Override
+                                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                                        autoConnectHandler.removeMessages(0);
+                                        autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
+                                    }
+
+                                    @Override
+                                    public void onWriteFailure(BleException exception) {
+                                        runOnUiThread(() -> {
+                                            isSend05 = false;
+                                            progressDialog.dismiss();
+                                            tipDialog.dismiss();
+                                            Toast.makeText(LockActivity.this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
+                                        });
+                                    }
+                                });
                     } else {
                         runOnUiThread(() -> {
                             isSend05 = false;

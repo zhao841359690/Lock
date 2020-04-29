@@ -8,6 +8,11 @@ public class Constants {
     public static final String IP = "61.174.28.14";
     public static final int PORT = 10074;
 
+    public static final String UUID_SERVICE = "0000ffe0-0000-1000-8000-00805f9b34fb";
+    public static final String UUID_WRITE_CHA = "0000ffe1-0000-1000-8000-00805f9b34fb";
+    public static final String UUID_READ_CHA = "0000ffe2-0000-1000-8000-00805f9b34fb";
+    public static final String UUID_NOTIFY = "0000ffe2-0000-1000-8000-00805f9b34fb";
+
     /**
      * Tag fragment
      */
