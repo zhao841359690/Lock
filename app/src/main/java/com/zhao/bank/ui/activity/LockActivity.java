@@ -239,6 +239,10 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
                 BleUtils.newInstance().clearData();
 
+                handler.removeMessages(0);
+                autoConnectHandler.removeMessages(0);
+                send05Handler.removeMessages(0);
+
                 Ble.getInstance().refreshDeviceCache(address.toUpperCase());
                 Ble.getInstance().connect(address.toUpperCase(), connectCallback);
                 break;
