@@ -1,9 +1,9 @@
 package com.zhao.bank.ui.activity;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCharacteristic;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
@@ -362,10 +362,30 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                             TypeBean typeBean = BleUtils.newInstance().read(characteristic);
                             if (typeBean != null) {
                                 if (Constants.READ_4 == typeBean.getType()) {
-                                    if (typeBean.getLockType() == Constants.Lock0 || typeBean.getLockType() == Constants.Lock3) {
-                                        if (tipDialog != null) {
-                                            tipDialog.dismiss();
-                                        }
+                                    if (typeBean.getLockType() == Constants.Lock0) {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
+                                                .setMessage("开锁成功").setPositiveButton("确定", (dialogInterface, i) -> {
+                                                    dialogInterface.dismiss();
+                                                    if (tipDialog != null) {
+                                                        tipDialog.dismiss();
+                                                    }
+                                                }).setNegativeButton("取消", (dialogInterface, i) -> {
+                                                    dialogInterface.dismiss();
+                                                });
+                                        builder.create().show();
+                                    } else if (typeBean.getLockType() == Constants.Lock2) {
+                                        Toast.makeText(LockActivity.this, "请把锁钩压回", Toast.LENGTH_LONG).show();
+                                    } else if (typeBean.getLockType() == Constants.Lock3) {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
+                                                .setMessage("关锁成功").setPositiveButton("确定", (dialogInterface, i) -> {
+                                                    dialogInterface.dismiss();
+                                                    if (tipDialog != null) {
+                                                        tipDialog.dismiss();
+                                                    }
+                                                }).setNegativeButton("取消", (dialogInterface, i) -> {
+                                                    dialogInterface.dismiss();
+                                                });
+                                        builder.create().show();
                                     }
                                 } else if (Constants.READ_5 == typeBean.getType()) {
                                     if (isSend05) {
