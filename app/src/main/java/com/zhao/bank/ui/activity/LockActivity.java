@@ -142,8 +142,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
                         @Override
                         public void onWriteFailure(BleException exception) {
-                            autoConnectHandler.removeMessages(0);
-                            autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
                         }
                     });
         }
@@ -218,8 +216,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                     lockBodyNumberTv.setText("锁体编号：" + uid);
                     cabinetNumber.setText("箱体编号：" + workOrderBean.getData().getBoxId());
                     timeTv.setText(workOrderBean.getData().getEffectTime() + " - " + workOrderBean.getData().getInvalidTime());
-                    typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>" + (showLock ? "开锁" : "开锁") + "</font>"));
-                    tipDialog.setOpenOrClose(showLock);
+                    typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>" + ("1".equals(workOrderBean.getData().getOperationType()) ? "开锁" : "关锁") + "</font>"));
+                    tipDialog.setOpenOrClose("1".equals(workOrderBean.getData().getOperationType()));
                 }, throwable -> {
                     Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
                     finish();
@@ -353,6 +351,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
                     @Override
                     public void onCharacteristicChanged(byte[] characteristic) {
+                        autoConnectHandler.removeMessages(0);
+                        autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
                         if (characteristic != null && characteristic.length == 17) {
                             TypeBean typeBean = BleUtils.newInstance().read(characteristic);
                             if (typeBean != null) {
@@ -373,8 +373,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                                     new BleWriteCallback() {
                                                         @Override
                                                         public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                                                            autoConnectHandler.removeMessages(0);
-                                                            autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
                                                         }
 
                                                         @Override
@@ -481,7 +479,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                     }
                                 }
                             } else {
-                                autoConnectHandler.removeMessages(0);
                                 BleManager.getInstance().stopNotify(mBleDevice,
                                         Constants.UUID_SERVICE,
                                         Constants.UUID_NOTIFY);
@@ -538,8 +535,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                 new BleWriteCallback() {
                                     @Override
                                     public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                                        autoConnectHandler.removeMessages(0);
-                                        autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
                                     }
 
                                     @Override
