@@ -95,6 +95,7 @@ public class ScanCodeActivity extends BaseActivity implements OnCaptureCallback 
             Intent intent = new Intent();
             intent.putExtra("result", result);
             setResult(fromWhere, intent);
+            finish();
         } else {
             RxHttp.get("/app/todoOrders")
                     .add("token", SharedPreferencesUtils.getInstance().getToken())
