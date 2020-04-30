@@ -301,7 +301,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
             if (lockType == Constants.Lock3) {
                 Toast.makeText(this, "锁已经处于关闭状态", Toast.LENGTH_SHORT).show();
             } else {
-                openOrClose(true);
+                openOrClose(false);
             }
         }
     }
