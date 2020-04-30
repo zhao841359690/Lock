@@ -76,6 +76,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
     private TipDialog tipDialog;
     private ProgressDialog progressDialog;
+    private int lockType;
 
     private BleDevice mBleDevice;
     private String address;
@@ -295,9 +296,17 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         }
 
         if (type == Constants.OPEN) {
-            openOrClose(true);
+            if (lockType == Constants.Lock0) {
+                Toast.makeText(this, "锁已经处于打开状态", Toast.LENGTH_SHORT).show();
+            } else {
+                openOrClose(true);
+            }
         } else if (type == Constants.CLOSE) {
-            openOrClose(false);
+            if (lockType == Constants.Lock3) {
+                Toast.makeText(this, "锁已经处于关闭状态", Toast.LENGTH_SHORT).show();
+            } else {
+                openOrClose(true);
+            }
         }
     }
 
@@ -361,7 +370,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         if (characteristic != null && characteristic.length == 17) {
                             TypeBean typeBean = BleUtils.newInstance().read(characteristic);
                             if (typeBean != null) {
-                                if (Constants.READ_4 == typeBean.getType()) {
+                                if (Constants.READ_1 == typeBean.getType()) {
+                                    lockType = typeBean.getLockType();
+                                } else if (Constants.READ_4 == typeBean.getType()) {
                                     if (typeBean.getLockType() == Constants.Lock0) {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
                                                 .setMessage("开锁成功").setPositiveButton("确定", (dialogInterface, i) -> {
