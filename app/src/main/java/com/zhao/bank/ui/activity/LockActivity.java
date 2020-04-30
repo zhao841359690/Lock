@@ -190,6 +190,11 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         tipDialog = new TipDialog(this, this);
         tipDialog.setOnDismissListener(dialogInterface -> {
             if (mBleDevice != null) {
+                handler.removeMessages(0);
+                autoConnectHandler.removeMessages(0);
+                send05Handler.removeMessages(0);
+
+                progressDialog.dismiss();
                 BleManager.getInstance().disconnect(mBleDevice);
             }
         });
