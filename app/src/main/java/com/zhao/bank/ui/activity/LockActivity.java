@@ -76,7 +76,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
     private TipDialog tipDialog;
     private ProgressDialog progressDialog;
-    private int lockType;
+    private int lockType = -1;
 
     private BleDevice mBleDevice;
     private String address;
@@ -160,11 +160,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                     new BleWriteCallback() {
                         @Override
                         public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                            progressDialog.dismiss();
-                            tipDialog.show();
 
-                            autoConnectHandler.removeMessages(0);
-                            autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
                         }
 
                         @Override
@@ -372,6 +368,13 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                             if (typeBean != null) {
                                 if (Constants.READ_1 == typeBean.getType()) {
                                     lockType = typeBean.getLockType();
+                                    if (!tipDialog.isShowing()) {
+                                        progressDialog.dismiss();
+                                        tipDialog.show();
+
+                                        autoConnectHandler.removeMessages(0);
+                                        autoConnectHandler.sendEmptyMessageDelayed(0, 1000 * 30);
+                                    }
                                 } else if (Constants.READ_4 == typeBean.getType()) {
                                     if (typeBean.getLockType() == Constants.Lock0) {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
