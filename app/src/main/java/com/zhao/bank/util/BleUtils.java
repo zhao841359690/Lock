@@ -160,13 +160,13 @@ public class BleUtils {
 
             if (typeByte == 0x01) {
                 typeBean.setType(Constants.READ_1);
-                if (dataBytes[1] == 0x00) {
+                if (dataBytes[3] == 0x00) {
                     typeBean.setLockType(Constants.Lock0);
-                } else if (dataBytes[1] == 0x01) {
+                } else if (dataBytes[3] == 0x01) {
                     typeBean.setLockType(Constants.Lock1);
-                } else if (dataBytes[1] == 0x02) {
+                } else if (dataBytes[3] == 0x02) {
                     typeBean.setLockType(Constants.Lock2);
-                } else if (dataBytes[1] == 0x03) {
+                } else if (dataBytes[3] == 0x03) {
                     typeBean.setLockType(Constants.Lock3);
                 }
             } else if (typeByte == 0x04) {
