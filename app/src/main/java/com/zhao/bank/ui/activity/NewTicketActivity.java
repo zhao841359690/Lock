@@ -120,7 +120,7 @@ public class NewTicketActivity extends BaseActivity {
                     RxHttp.postJson("/app/workOrder")
                             .addHeader("token", SharedPreferencesUtils.getInstance().getToken())
                             .add("boxId", boxId)
-                            .add("uId", uId)
+                            .add("hexUid", uId)
                             .add("effectTime", effectTime)
                             .add("invalidTime", invalidTime)
                             .add("operationType", "开锁".equals(operationType) ? 1 : 2)
