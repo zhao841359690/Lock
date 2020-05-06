@@ -14,6 +14,7 @@ import com.king.zxing.ViewfinderView;
 import com.zhao.bank.R;
 import com.zhao.bank.app.BaseApp;
 import com.zhao.bank.base.BaseActivity;
+import com.zhao.bank.bean.LockInfoBean;
 import com.zhao.bank.bean.TodoOrdersBean;
 import com.zhao.bank.core.constant.Constants;
 import com.zhao.bank.util.SharedPreferencesUtils;
@@ -93,10 +94,38 @@ public class ScanCodeActivity extends BaseActivity implements OnCaptureCallback 
     @Override
     public boolean onResultCallback(String result) {
         if (fromWhere != Constants.SCAN_CODE) {
-            Intent intent = new Intent();
-            intent.putExtra("result", result);
-            setResult(fromWhere, intent);
-            finish();
+            if (fromWhere == Constants.CASH_DRAWER_NUMBER) {
+                Intent intent = new Intent();
+                intent.putExtra("result", result);
+                setResult(fromWhere, intent);
+                finish();
+            } else {
+                String reg = "^([0-9a-f]{2})(([:][0-9a-f]{2}){5})$";
+                if (!Pattern.compile(reg).matcher(result).find()) {
+                    Toast.makeText(this, "二维码错误", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    RxHttp.get("/app/getLockInfo")
+                            .add("bleMac", result)
+                            .add("token", SharedPreferencesUtils.getInstance().getToken())
+                            .asClass(LockInfoBean.class)
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(lockInfoBean -> {
+                                if (lockInfoBean.getCode() == 200) {
+                                    Intent intent = new Intent();
+                                    intent.putExtra("result", lockInfoBean.getData().getHexUid());
+                                    setResult(fromWhere, intent);
+                                    finish();
+                                } else {
+                                    Toast.makeText(BaseApp.getContext(), lockInfoBean.getMsg(), Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+                            }, throwable -> {
+                                Toast.makeText(BaseApp.getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                finish();
+                            });
+                }
+            }
         } else {
             String reg = "^([0-9a-f]{2})(([:][0-9a-f]{2}){5})$";
             if (!Pattern.compile(reg).matcher(result).find()) {
