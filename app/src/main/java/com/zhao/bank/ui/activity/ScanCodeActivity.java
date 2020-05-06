@@ -21,6 +21,7 @@ import com.zhao.bank.util.SharedPreferencesUtils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -97,46 +98,52 @@ public class ScanCodeActivity extends BaseActivity implements OnCaptureCallback 
             setResult(fromWhere, intent);
             finish();
         } else {
-            RxHttp.get("/app/todoOrders")
-                    .add("token", SharedPreferencesUtils.getInstance().getToken())
-                    .asClass(TodoOrdersBean.class)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(todoOrdersBean -> {
-                        if (todoOrdersBean.getCode() == 200) {
-                            if (todoOrdersBean.getData() != null && todoOrdersBean.getData().size() > 0) {
-                                boolean canFind = false;
-                                List<TodoOrdersBean.DataBean> dataBeanList = new ArrayList<>();
+            String reg = "^([0-9a-f]{2})(([:][0-9a-f]{2}){5})$";
+            if (!Pattern.compile(reg).matcher(result).find()) {
+                Toast.makeText(this, "二维码错误", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                RxHttp.get("/app/todoOrders")
+                        .add("token", SharedPreferencesUtils.getInstance().getToken())
+                        .asClass(TodoOrdersBean.class)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(todoOrdersBean -> {
+                            if (todoOrdersBean.getCode() == 200) {
+                                if (todoOrdersBean.getData() != null && todoOrdersBean.getData().size() > 0) {
+                                    boolean canFind = false;
+                                    List<TodoOrdersBean.DataBean> dataBeanList = new ArrayList<>();
 
-                                for (TodoOrdersBean.DataBean datum : todoOrdersBean.getData()) {
-                                    if (datum.getLock().getBleMac().equals(result)) {
-                                        canFind = true;
-                                        dataBeanList.add(datum);
+                                    for (TodoOrdersBean.DataBean datum : todoOrdersBean.getData()) {
+                                        if (datum.getLock().getBleMac().equals(result)) {
+                                            canFind = true;
+                                            dataBeanList.add(datum);
+                                        }
                                     }
-                                }
-                                if (canFind) {
-                                    Intent intent = new Intent(this, TodoOrdersActivity.class);
-                                    Bundle bundle = new Bundle();
-                                    bundle.putSerializable("todo", (Serializable) dataBeanList);
-                                    intent.putExtras(bundle);
-                                    startActivity(intent);
-                                    finish();
+                                    if (canFind) {
+                                        Intent intent = new Intent(this, TodoOrdersActivity.class);
+                                        Bundle bundle = new Bundle();
+                                        bundle.putSerializable("todo", (Serializable) dataBeanList);
+                                        intent.putExtras(bundle);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        Intent intent = new Intent(this, NoTicketActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
                                 } else {
-                                    Intent intent = new Intent(this, NoTicketActivity.class);
-                                    startActivity(intent);
+                                    Toast.makeText(BaseApp.getContext(), "无法访问该设备!您可以换个设备试试", Toast.LENGTH_SHORT).show();
                                     finish();
                                 }
                             } else {
-                                Toast.makeText(BaseApp.getContext(), "无法访问该设备!您可以换个设备试试", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(BaseApp.getContext(), todoOrdersBean.getMsg(), Toast.LENGTH_SHORT).show();
                                 finish();
                             }
-                        } else {
-                            Toast.makeText(BaseApp.getContext(), todoOrdersBean.getMsg(), Toast.LENGTH_SHORT).show();
+                        }, throwable -> {
+                            Toast.makeText(BaseApp.getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
                             finish();
-                        }
-                    }, throwable -> {
-                        Toast.makeText(BaseApp.getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
-                        finish();
-                    });
+                        });
+            }
         }
         return true;
     }
