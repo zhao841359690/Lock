@@ -162,8 +162,10 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
                         return;
                     }
                 }
-                bleDeviceList.add(bleDevice);
-                mAdapter.setBleBeanList(bleDeviceList);
+                if (bleDevice.getName().toUpperCase().contains("MPDTC")) {
+                    bleDeviceList.add(bleDevice);
+                    mAdapter.setBleBeanList(bleDeviceList);
+                }
             }
         });
     }
