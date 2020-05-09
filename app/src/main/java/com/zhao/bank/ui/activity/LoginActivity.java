@@ -39,6 +39,11 @@ public class LoginActivity extends BaseActivity {
 
     @Override
     protected void initView() {
+        if (!TextUtils.isEmpty(SharedPreferencesUtils.getInstance().getPhoneNumber())) {
+            phoneNumberEt.setText(SharedPreferencesUtils.getInstance().getPhoneNumber());
+            passwordEt.setText(SharedPreferencesUtils.getInstance().getPassword());
+            rememberPasswordCb.setChecked(true);
+        }
     }
 
     @OnClick({R.id.rememberPassword_ly, R.id.login_btn})
@@ -77,6 +82,10 @@ public class LoginActivity extends BaseActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(loginBean -> {
                     if (loginBean.getCode() == 200) {
+                        if (rememberPasswordCb.isChecked()) {
+                            SharedPreferencesUtils.getInstance().setPhoneNumber(phoneNumber);
+                            SharedPreferencesUtils.getInstance().setPassword(password);
+                        }
                         SharedPreferencesUtils.getInstance().setToken(loginBean.getData().getToken());
                         SharedPreferencesUtils.getInstance().setUserId(loginBean.getData().getUserInfo().getUserId());
                         SharedPreferencesUtils.getInstance().setUserName(loginBean.getData().getUserInfo().getUsername());

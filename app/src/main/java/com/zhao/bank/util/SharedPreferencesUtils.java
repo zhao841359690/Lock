@@ -20,6 +20,23 @@ public class SharedPreferencesUtils {
         mPreferences = BaseApp.getContext().getSharedPreferences("my_shared_preference", Context.MODE_PRIVATE);
     }
 
+    public void setPhoneNumber(String value) {
+        mPreferences.edit().putString("phoneNumber", value).apply();
+    }
+
+    public String getPhoneNumber() {
+        return mPreferences.getString("phoneNumber", null);
+    }
+
+    public void setPassword(String value) {
+        mPreferences.edit().putString("password", value).apply();
+    }
+
+    public String getPassword() {
+        return mPreferences.getString("password", null);
+    }
+
+
     public void setToken(String value) {
         mPreferences.edit().putString("token", value).apply();
     }
