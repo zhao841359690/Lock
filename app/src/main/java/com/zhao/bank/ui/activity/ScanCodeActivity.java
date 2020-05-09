@@ -102,7 +102,7 @@ public class ScanCodeActivity extends BaseActivity implements OnCaptureCallback 
             } else {
                 String reg = "^([0-9a-f]{2})(([:][0-9a-f]{2}){5})$";
                 if (!Pattern.compile(reg).matcher(result).find()) {
-                    Toast.makeText(this, "二维码错误", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "二维码错误", Toast.LENGTH_LONG).show();
                     finish();
                 } else {
                     RxHttp.get("/app/getLockInfo")
@@ -117,11 +117,11 @@ public class ScanCodeActivity extends BaseActivity implements OnCaptureCallback 
                                     setResult(fromWhere, intent);
                                     finish();
                                 } else {
-                                    Toast.makeText(BaseApp.getContext(), lockInfoBean.getMsg(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(BaseApp.getContext(), lockInfoBean.getMsg(), Toast.LENGTH_LONG).show();
                                     finish();
                                 }
                             }, throwable -> {
-                                Toast.makeText(BaseApp.getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(BaseApp.getContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
                                 finish();
                             });
                 }
@@ -129,7 +129,7 @@ public class ScanCodeActivity extends BaseActivity implements OnCaptureCallback 
         } else {
             String reg = "^([0-9a-f]{2})(([:][0-9a-f]{2}){5})$";
             if (!Pattern.compile(reg).matcher(result).find()) {
-                Toast.makeText(this, "二维码错误", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "二维码错误", Toast.LENGTH_LONG).show();
                 finish();
             } else {
                 RxHttp.get("/app/todoOrders")
@@ -161,15 +161,15 @@ public class ScanCodeActivity extends BaseActivity implements OnCaptureCallback 
                                         finish();
                                     }
                                 } else {
-                                    Toast.makeText(BaseApp.getContext(), "无法访问该设备!您可以换个设备试试", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(BaseApp.getContext(), "无法访问该设备!您可以换个设备试试", Toast.LENGTH_LONG).show();
                                     finish();
                                 }
                             } else {
-                                Toast.makeText(BaseApp.getContext(), todoOrdersBean.getMsg(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(BaseApp.getContext(), todoOrdersBean.getMsg(), Toast.LENGTH_LONG).show();
                                 finish();
                             }
                         }, throwable -> {
-                            Toast.makeText(BaseApp.getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(BaseApp.getContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
                             finish();
                         });
             }

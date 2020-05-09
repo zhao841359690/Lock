@@ -116,20 +116,20 @@ public class BleScanActivity extends BaseActivity implements BleScanAdapter.OnIt
                                 finish();
                             }
                         } else {
-                            Toast.makeText(BaseApp.getContext(), "无法访问该设备!您可以换个设备试试", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(BaseApp.getContext(), "无法访问该设备!您可以换个设备试试", Toast.LENGTH_LONG).show();
                         }
                     } else {
-                        Toast.makeText(BaseApp.getContext(), todoOrdersBean.getMsg(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(BaseApp.getContext(), todoOrdersBean.getMsg(), Toast.LENGTH_LONG).show();
                     }
                 }, throwable -> {
-                    Toast.makeText(BaseApp.getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(BaseApp.getContext(), throwable.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
 
 
     private void scan() {
         if (!BleManager.getInstance().isSupportBle()) {
-            Toast.makeText(BaseApp.getContext(), "BLE is not supported", Toast.LENGTH_SHORT).show();
+            Toast.makeText(BaseApp.getContext(), "BLE is not supported", Toast.LENGTH_LONG).show();
             return;
         }
 

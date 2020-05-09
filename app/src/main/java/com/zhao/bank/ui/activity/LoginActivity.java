@@ -68,11 +68,11 @@ public class LoginActivity extends BaseActivity {
         String phoneNumber = phoneNumberEt.getText().toString().trim();
         String password = passwordEt.getText().toString().trim();
         if (TextUtils.isEmpty(phoneNumber)) {
-            Toast.makeText(this, "请输入您的手机号", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "请输入您的手机号", Toast.LENGTH_LONG).show();
             return;
         }
         if (TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "请输入您的密码", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "请输入您的密码", Toast.LENGTH_LONG).show();
             return;
         }
         RxHttp.postJson("/app/login")
@@ -94,10 +94,10 @@ public class LoginActivity extends BaseActivity {
                         startActivity(intent);
                         finish();
                     } else {
-                        Toast.makeText(this, loginBean.getMsg(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, loginBean.getMsg(), Toast.LENGTH_LONG).show();
                     }
                 }, throwable -> {
-                    Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_LONG).show();
                 });
     }
 }

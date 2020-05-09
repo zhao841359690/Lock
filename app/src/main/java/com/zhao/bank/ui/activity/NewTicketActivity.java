@@ -131,10 +131,10 @@ public class NewTicketActivity extends BaseActivity {
                                     intent = new Intent(this, OrdersActivity.class);
                                     startActivity(intent);
                                 } else {
-                                    Toast.makeText(this, baseBean.getMsg(), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(this, baseBean.getMsg(), Toast.LENGTH_LONG).show();
                                 }
                             }, throwable -> {
-                                Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_LONG).show();
                             });
                 }
                 break;

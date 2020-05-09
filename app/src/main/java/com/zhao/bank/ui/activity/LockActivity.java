@@ -166,7 +166,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         @Override
                         public void onWriteFailure(BleException exception) {
                             progressDialog.dismiss();
-                            Toast.makeText(LockActivity.this, "连接失败", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LockActivity.this, "连接失败", Toast.LENGTH_LONG).show();
                         }
                     });
         }
@@ -221,7 +221,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                     typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>" + ("1".equals(workOrderBean.getData().getOperationType()) ? "开锁" : "关锁") + "</font>"));
                     tipDialog.setOpenOrClose("1".equals(workOrderBean.getData().getOperationType()));
                 }, throwable -> {
-                    Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_LONG).show();
                     finish();
                 });
         RxHttp.get("/app/todoOrders")
@@ -287,19 +287,19 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         }
 
         if (needSend05) {
-            Toast.makeText(this, "正在发送数据，请稍后点击", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "正在发送数据，请稍后点击", Toast.LENGTH_LONG).show();
             return;
         }
 
         if (type == Constants.OPEN) {
             if (lockType == Constants.Lock0) {
-                Toast.makeText(this, "锁已经处于打开状态", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "锁已经处于打开状态", Toast.LENGTH_LONG).show();
             } else {
                 openOrClose(true);
             }
         } else if (type == Constants.CLOSE) {
             if (lockType == Constants.Lock3) {
-                Toast.makeText(this, "锁已经处于关闭状态", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "锁已经处于关闭状态", Toast.LENGTH_LONG).show();
             } else {
                 openOrClose(false);
             }
@@ -328,7 +328,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         @Override
         public void onConnectFail(BleDevice bleDevice, BleException exception) {
             progressDialog.dismiss();
-            Toast.makeText(LockActivity.this, "连接异常，异常状态码:" + exception.getCode(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(LockActivity.this, "连接异常，异常状态码:" + exception.getCode(), Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -383,8 +383,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                                     if (tipDialog != null) {
                                                         tipDialog.dismiss();
                                                     }
-                                                }).setNegativeButton("取消", (dialogInterface, i) -> {
-                                                    dialogInterface.dismiss();
                                                 });
                                         builder.create().show();
                                     } else if (typeBean.getLockType() == Constants.Lock2) {
@@ -396,8 +394,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                                     if (tipDialog != null) {
                                                         tipDialog.dismiss();
                                                     }
-                                                }).setNegativeButton("取消", (dialogInterface, i) -> {
-                                                    dialogInterface.dismiss();
                                                 });
                                         builder.create().show();
                                     }
@@ -524,7 +520,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
                                 progressDialog.dismiss();
                                 tipDialog.dismiss();
-                                Toast.makeText(LockActivity.this, "上行验证码相同,蓝牙已断开连接", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LockActivity.this, "上行验证码相同,蓝牙已断开连接", Toast.LENGTH_LONG).show();
                             }
                         }
 
@@ -600,7 +596,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 e.printStackTrace();
                 progressDialog.dismiss();
                 tipDialog.dismiss();
-                Toast.makeText(LockActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(LockActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
 
             }
         });
