@@ -28,6 +28,8 @@ public class HomePageFragment extends BaseFragment {
     @BindView(R.id.ticket_number_tv)
     TextView ticketNumberTv;
 
+    private static HomePageFragment homePageFragment = null;
+
     private OnHomePageFragmentClickListener onHomePageFragmentClickListener;
 
     public void setOnHomePageFragmentClickListener(OnHomePageFragmentClickListener onHomePageFragmentClickListener) {
@@ -43,7 +45,14 @@ public class HomePageFragment extends BaseFragment {
     }
 
     public static HomePageFragment newInstance() {
-        return new HomePageFragment();
+        if (homePageFragment == null) {
+            synchronized (HomePageFragment.class) {
+                if (homePageFragment == null) {
+                    homePageFragment = new HomePageFragment();
+                }
+            }
+        }
+        return homePageFragment;
     }
 
     @Override

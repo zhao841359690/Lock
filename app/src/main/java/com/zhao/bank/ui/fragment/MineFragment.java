@@ -23,6 +23,7 @@ public class MineFragment extends BaseFragment {
     RelativeLayout aboutRl;
     @BindView(R.id.sign_out_tv)
     TextView signOutTv;
+    private static MineFragment mineFragment = null;
 
     private OnMineFragmentClickListener onMineFragmentClickListener;
 
@@ -39,7 +40,14 @@ public class MineFragment extends BaseFragment {
     }
 
     public static MineFragment newInstance() {
-        return new MineFragment();
+        if (mineFragment == null) {
+            synchronized (MineFragment.class) {
+                if (mineFragment == null) {
+                    mineFragment = new MineFragment();
+                }
+            }
+        }
+        return mineFragment;
     }
 
     @Override
