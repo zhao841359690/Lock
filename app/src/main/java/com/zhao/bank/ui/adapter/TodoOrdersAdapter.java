@@ -46,6 +46,7 @@ public class TodoOrdersAdapter extends RecyclerView.Adapter<TodoOrdersAdapter.Vi
         viewHolder.ticketNumberTv.setText("工单编号:" + dataBean.getWorkId());
         viewHolder.pendingTv.setVisibility(View.VISIBLE);
         viewHolder.lockBodyNumberTv.setText("锁体编号:" + dataBean.getLock().getHexUid());
+        viewHolder.lockTypeTv.setText("1".equals(dataBean.getOperationType()) ? "开锁" : "关锁");
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,12 +65,14 @@ public class TodoOrdersAdapter extends RecyclerView.Adapter<TodoOrdersAdapter.Vi
         TextView ticketNumberTv;
         TextView pendingTv;
         TextView lockBodyNumberTv;
+        TextView lockTypeTv;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             ticketNumberTv = itemView.findViewById(R.id.ticket_number_tv);
             pendingTv = itemView.findViewById(R.id.pending_tv);
             lockBodyNumberTv = itemView.findViewById(R.id.lock_body_number_tv);
+            lockTypeTv = itemView.findViewById(R.id.lock_type_tv);
         }
     }
 

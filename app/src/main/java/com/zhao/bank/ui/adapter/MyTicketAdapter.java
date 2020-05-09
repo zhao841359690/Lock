@@ -48,6 +48,7 @@ public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.ViewHo
         if (contentBean.getLock() != null) {
             viewHolder.lockBodyNumberTv.setText("锁体编号:" + contentBean.getLock().getHexUid());
         }
+        viewHolder.lockTypeTv.setText("1".equals(contentBean.getOperationType()) ? "开锁" : "关锁");
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,12 +69,14 @@ public class MyTicketAdapter extends RecyclerView.Adapter<MyTicketAdapter.ViewHo
         TextView ticketNumberTv;
         TextView pendingTv;
         TextView lockBodyNumberTv;
+        TextView lockTypeTv;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             ticketNumberTv = itemView.findViewById(R.id.ticket_number_tv);
             pendingTv = itemView.findViewById(R.id.pending_tv);
             lockBodyNumberTv = itemView.findViewById(R.id.lock_body_number_tv);
+            lockTypeTv = itemView.findViewById(R.id.lock_type_tv);
         }
     }
 
