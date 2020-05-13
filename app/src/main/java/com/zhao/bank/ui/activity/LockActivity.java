@@ -332,15 +332,18 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                 if (Constants.READ_1 == typeBean.getType()) {
                                     if (isOpenOrClose) {
                                         if (typeBean.getLockType() == Constants.Lock0) {
-                                            tipDialog.setOpenOrCloseCannotClick();
+                                            tipDialog.setClick(true);
                                         }
                                     } else {
                                         if (typeBean.getLockType() == Constants.Lock3) {
-                                            tipDialog.setOpenOrCloseCannotClick();
+                                            tipDialog.setClick(true);
                                         }
                                     }
                                     if (!tipDialog.isShowing()) {
                                         tipDialog.show();
+
+                                        progressDialog.dismiss();
+                                        progressDialog.show();
                                     }
                                 } else if (Constants.READ_4 == typeBean.getType()) {
                                     if (typeBean.getLockType() == Constants.Lock0) {
@@ -530,7 +533,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         write06 = new ArrayList<>();
 
         if (tipDialog != null) {
-            tipDialog.setOpenOrCloseCanClick();
+            tipDialog.setClick(false);
         }
     }
 }

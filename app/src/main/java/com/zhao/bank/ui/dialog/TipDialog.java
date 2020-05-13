@@ -21,6 +21,7 @@ public class TipDialog extends Dialog implements View.OnClickListener {
     private TextView cancelTv;
 
     private boolean openOrClose;
+    private boolean click;
 
     private OnTipDialogClickListener onTipDialogClickListener;
 
@@ -34,14 +35,9 @@ public class TipDialog extends Dialog implements View.OnClickListener {
         this.openOrClose = openOrClose;
     }
 
-    public void setOpenOrCloseCannotClick() {
-        openCloseTv.setBackgroundResource(R.drawable.shape_gray);
-        openCloseTv.setOnClickListener(null);
-    }
+    public void setClick(boolean click) {
+        this.click = click;
 
-    public void setOpenOrCloseCanClick() {
-        openCloseTv.setBackgroundResource(R.drawable.shape_gradation_blue);
-        openCloseTv.setOnClickListener(this);
     }
 
     @Override
@@ -61,7 +57,13 @@ public class TipDialog extends Dialog implements View.OnClickListener {
         openCloseTv = findViewById(R.id.open_close_tv);
         openCloseTv.setText(openOrClose ? "开锁" : "关锁");
 
-        openCloseTv.setOnClickListener(this);
+        if (click) {
+            openCloseTv.setBackgroundResource(R.drawable.shape_gradation_blue);
+            openCloseTv.setOnClickListener(this);
+        } else {
+            openCloseTv.setBackgroundResource(R.drawable.shape_gray);
+            openCloseTv.setOnClickListener(null);
+        }
         cancelTv = findViewById(R.id.cancel_tv);
         cancelTv.setOnClickListener(this);
 
