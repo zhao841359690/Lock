@@ -77,7 +77,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
     private TipDialog tipDialog;
     private ProgressDialog progressDialog;
-    private int lockType = -1;
+    private boolean isOpenOrClose = false;
 
     private BleDevice mBleDevice;
     private String address;
@@ -210,6 +210,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 .asClass(WorkOrderBean.class)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(workOrderBean -> {
+                    isOpenOrClose = "1".equals(workOrderBean.getData().getOperationType());
+
                     address = workOrderBean.getData().getLock().getBleMac();
                     uid = workOrderBean.getData().getLock().getHexUid();
 
@@ -217,8 +219,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                     lockBodyNumberTv.setText("锁体编号：" + uid);
                     cabinetNumber.setText("箱体编号：" + workOrderBean.getData().getBoxId());
                     timeTv.setText(workOrderBean.getData().getEffectTime() + " - " + workOrderBean.getData().getInvalidTime());
-                    typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>" + ("1".equals(workOrderBean.getData().getOperationType()) ? "开锁" : "关锁") + "</font>"));
-                    tipDialog.setOpenOrClose("1".equals(workOrderBean.getData().getOperationType()));
+                    typeTv.setText(Html.fromHtml("操作类型：<font color='#0E5EAB'>" + (isOpenOrClose ? "开锁" : "关锁") + "</font>"))
+                    ;
+                    tipDialog.setOpenOrClose(isOpenOrClose);
                 }, throwable -> {
                     Toast.makeText(this, throwable.getMessage(), Toast.LENGTH_LONG).show();
                     finish();
@@ -252,6 +255,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
             socket.close();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        if (mBleDevice != null) {
+            BleManager.getInstance().disconnect(mBleDevice);
         }
         clearData();
     }
@@ -288,23 +294,10 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
             return;
         }
 
-        if (needSend05) {
-            Toast.makeText(this, "正在发送数据，请稍后点击", Toast.LENGTH_LONG).show();
-            return;
-        }
-
         if (type == Constants.OPEN) {
-            if (lockType == Constants.Lock0) {
-                Toast.makeText(this, "锁已经处于打开状态", Toast.LENGTH_LONG).show();
-            } else {
-                openOrClose(true);
-            }
+            openOrClose(true);
         } else if (type == Constants.CLOSE) {
-            if (lockType == Constants.Lock3) {
-                Toast.makeText(this, "锁已经处于关闭状态", Toast.LENGTH_LONG).show();
-            } else {
-                openOrClose(false);
-            }
+            openOrClose(false);
         }
     }
 
@@ -371,9 +364,16 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                             TypeBean typeBean = BleUtils.newInstance().read(characteristic);
                             if (typeBean != null) {
                                 if (Constants.READ_1 == typeBean.getType()) {
-                                    lockType = typeBean.getLockType();
+                                    if (isOpenOrClose) {
+                                        if (typeBean.getLockType() == Constants.Lock0) {
+                                            tipDialog.setOpenOrCloseCannotClick();
+                                        }
+                                    } else {
+                                        if (typeBean.getLockType() == Constants.Lock3) {
+                                            tipDialog.setOpenOrCloseCannotClick();
+                                        }
+                                    }
                                     if (!tipDialog.isShowing()) {
-                                        progressDialog.dismiss();
                                         tipDialog.show();
 
                                         autoConnectHandler.removeMessages(0);
@@ -386,7 +386,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                                         (dialogInterface, i) -> dialogInterface.dismiss());
                                         builder.create().show();
                                     } else if (typeBean.getLockType() == Constants.Lock2) {
-                                        Toast.makeText(LockActivity.this, "请把锁钩压回", Toast.LENGTH_LONG).show();
+                                        progressDialog.setMessage("请把锁钩压回");
                                     } else if (typeBean.getLockType() == Constants.Lock3) {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
                                                 .setMessage("关锁成功").setPositiveButton("确定",
@@ -508,14 +508,11 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                         });
                                     }
                                 } else if (Constants.READ_7 == typeBean.getType()) {
-                                    if (tipDialog != null) {
-                                        tipDialog.dismiss();
-                                    }
+                                    progressDialog.dismiss();
                                 }
                             } else {
                                 BleManager.getInstance().stopNotify(mBleDevice, Constants.UUID_SERVICE, Constants.UUID_NOTIFY);
 
-                                progressDialog.dismiss();
                                 tipDialog.dismiss();
                                 Toast.makeText(LockActivity.this, "上行验证码相同,蓝牙已断开连接", Toast.LENGTH_LONG).show();
                             }
@@ -570,27 +567,26 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                     @Override
                                     public void onWriteFailure(BleException exception) {
                                         isSend05 = false;
-                                        progressDialog.dismiss();
                                         tipDialog.dismiss();
                                         Toast.makeText(LockActivity.this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
                                     }
                                 });
                     } else {
                         isSend05 = false;
-                        progressDialog.dismiss();
                         tipDialog.dismiss();
+                        lockLy.setVisibility(View.GONE);
                         Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     isSend05 = false;
-                    progressDialog.dismiss();
                     tipDialog.dismiss();
+                    lockLy.setVisibility(View.GONE);
                     Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                progressDialog.dismiss();
                 tipDialog.dismiss();
+                lockLy.setVisibility(View.GONE);
                 Toast.makeText(LockActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
@@ -600,8 +596,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         handler.removeMessages(0);
         autoConnectHandler.removeMessages(0);
         send05Handler.removeMessages(0);
-
-        lockType = -1;
 
         write05 = new ArrayList<>();
         write05Index = 0;

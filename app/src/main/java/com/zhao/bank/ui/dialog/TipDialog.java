@@ -34,6 +34,11 @@ public class TipDialog extends Dialog implements View.OnClickListener {
         this.openOrClose = openOrClose;
     }
 
+    public void setOpenOrCloseCannotClick() {
+        openCloseTv.setBackgroundResource(R.drawable.shape_gray);
+        openCloseTv.setOnClickListener(null);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
