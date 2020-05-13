@@ -606,5 +606,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         needSend05 = false;
 
         write06 = new ArrayList<>();
+
+        if (tipDialog != null) {
+            tipDialog.setOpenOrCloseCanClick();
+        }
     }
 }
