@@ -247,14 +247,6 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     }
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            finish();
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    @Override
     public void onOpenCloseClick(int type) {
         if (mBleDevice == null) {
             return;
