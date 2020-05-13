@@ -31,6 +31,7 @@ public class Constants {
     public static final int READ_4 = 4;
     public static final int READ_5 = 5;
     public static final int READ_6 = 6;
+    public static final int READ_7 = 7;
 
     public static final int Lock0 = 0;//锁具已解锁，即锁具已完全打开
     public static final int Lock1 = 1;//机构解锁等待手柄或锁钩打开，挂锁不返回此状态

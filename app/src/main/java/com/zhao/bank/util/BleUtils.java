@@ -210,6 +210,8 @@ public class BleUtils {
                     }
                     typeBean.setData(data);
                 }
+            } else if (typeByte == 0x07) {
+                typeBean.setType(Constants.READ_7);
             }
             return typeBean;
         }

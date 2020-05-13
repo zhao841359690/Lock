@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothGatt;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -187,9 +188,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         tipDialog = new TipDialog(this, this);
         tipDialog.setOnDismissListener(dialogInterface -> {
             if (mBleDevice != null) {
-                handler.removeMessages(0);
-                autoConnectHandler.removeMessages(0);
-                send05Handler.removeMessages(0);
+                clearData();
 
                 progressDialog.dismiss();
                 BleManager.getInstance().disconnect(mBleDevice);
@@ -254,9 +253,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         } catch (Exception e) {
             e.printStackTrace();
         }
-        handler.removeMessages(0);
-        autoConnectHandler.removeMessages(0);
-        send05Handler.removeMessages(0);
+        clearData();
     }
 
     @OnClick({R.id.title_left_rl, R.id.lock_ly})
@@ -269,15 +266,20 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 progressDialog.setMessage("蓝牙连接中...");
                 progressDialog.show();
 
+                clearData();
                 BleUtils.newInstance().clearData();
-
-                handler.removeMessages(0);
-                autoConnectHandler.removeMessages(0);
-                send05Handler.removeMessages(0);
 
                 BleManager.getInstance().connect(address.toUpperCase(), bleGattCallback);
                 break;
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            finish();
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
@@ -340,7 +342,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
         @Override
         public void onDisConnected(boolean isActiveDisConnected, BleDevice device, BluetoothGatt gatt, int status) {
-
+            if (tipDialog != null) {
+                tipDialog.dismiss();
+            }
         }
     };
 
@@ -378,23 +382,15 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                 } else if (Constants.READ_4 == typeBean.getType()) {
                                     if (typeBean.getLockType() == Constants.Lock0) {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
-                                                .setMessage("开锁成功").setPositiveButton("确定", (dialogInterface, i) -> {
-                                                    dialogInterface.dismiss();
-                                                    if (tipDialog != null) {
-                                                        tipDialog.dismiss();
-                                                    }
-                                                });
+                                                .setMessage("开锁成功").setPositiveButton("确定",
+                                                        (dialogInterface, i) -> dialogInterface.dismiss());
                                         builder.create().show();
                                     } else if (typeBean.getLockType() == Constants.Lock2) {
                                         Toast.makeText(LockActivity.this, "请把锁钩压回", Toast.LENGTH_LONG).show();
                                     } else if (typeBean.getLockType() == Constants.Lock3) {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
-                                                .setMessage("关锁成功").setPositiveButton("确定", (dialogInterface, i) -> {
-                                                    dialogInterface.dismiss();
-                                                    if (tipDialog != null) {
-                                                        tipDialog.dismiss();
-                                                    }
-                                                });
+                                                .setMessage("关锁成功").setPositiveButton("确定",
+                                                        (dialogInterface, i) -> dialogInterface.dismiss());
                                         builder.create().show();
                                     }
                                 } else if (Constants.READ_5 == typeBean.getType()) {
@@ -441,8 +437,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                     }
                                 } else if (Constants.READ_6 == typeBean.getType()) {
                                     write06.add(typeBean.getData());
-                                    BleManager.getInstance().write(
-                                            mBleDevice,
+                                    BleManager.getInstance().write(mBleDevice,
                                             Constants.UUID_SERVICE,
                                             Constants.UUID_WRITE_CHA,
                                             BleUtils.newInstance().write06(typeBean.getIdx(), (byte) 0x00),
@@ -512,18 +507,19 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                             }
                                         });
                                     }
+                                } else if (Constants.READ_7 == typeBean.getType()) {
+                                    if (tipDialog != null) {
+                                        tipDialog.dismiss();
+                                    }
                                 }
                             } else {
-                                BleManager.getInstance().stopNotify(mBleDevice,
-                                        Constants.UUID_SERVICE,
-                                        Constants.UUID_NOTIFY);
+                                BleManager.getInstance().stopNotify(mBleDevice, Constants.UUID_SERVICE, Constants.UUID_NOTIFY);
 
                                 progressDialog.dismiss();
                                 tipDialog.dismiss();
                                 Toast.makeText(LockActivity.this, "上行验证码相同,蓝牙已断开连接", Toast.LENGTH_LONG).show();
                             }
                         }
-
                     }
                 });
     }
@@ -562,10 +558,9 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         isSend05 = true;
                         write05 = DataConvert.needSend05(data);
                         write05Index = 0;
-                        BleManager.getInstance().write(
-                                mBleDevice,
-                                "0000ffe0-0000-1000-8000-00805f9b34fb",
-                                "0000ffe1-0000-1000-8000-00805f9b34fb",
+                        BleManager.getInstance().write(mBleDevice,
+                                Constants.UUID_SERVICE,
+                                Constants.UUID_WRITE_CHA,
                                 BleUtils.newInstance().write05(write05Index, write05),
                                 new BleWriteCallback() {
                                     @Override
@@ -597,8 +592,25 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 progressDialog.dismiss();
                 tipDialog.dismiss();
                 Toast.makeText(LockActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-
             }
         });
+    }
+
+    private void clearData() {
+        handler.removeMessages(0);
+        autoConnectHandler.removeMessages(0);
+        send05Handler.removeMessages(0);
+
+        lockType = -1;
+
+        write05 = new ArrayList<>();
+        write05Index = 0;
+        isSend05 = false;
+
+        needWrite05 = new ArrayList<>();
+        needWrite05Index = 0;
+        needSend05 = false;
+
+        write06 = new ArrayList<>();
     }
 }
