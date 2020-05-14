@@ -90,7 +90,41 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
     private List<byte[]> write05 = new ArrayList<>();
     private int write05Index = 0;
+    private boolean isSend05 = false;
+
+    private List<byte[]> needWrite05 = new ArrayList<>();
+    private int needWrite05Index = 0;
+    private boolean needSend05 = false;
+
     private List<byte[]> write06 = new ArrayList<>();
+
+    @SuppressLint("HandlerLeak")
+    private Handler send05Handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (!isSend05) {
+                BleManager.getInstance().write(mBleDevice,
+                        Constants.UUID_SERVICE,
+                        Constants.UUID_WRITE_CHA,
+                        BleUtils.newInstance().write05(needWrite05Index, needWrite05),
+                        new BleWriteCallback() {
+                            @Override
+                            public void onWriteSuccess(int current, int total, byte[] justWrite) {
+
+                            }
+
+                            @Override
+                            public void onWriteFailure(BleException exception) {
+                                needSend05 = false;
+                            }
+                        });
+            } else {
+                send05Handler.removeMessages(0);
+                send05Handler.sendEmptyMessageDelayed(0, 1000);
+            }
+        }
+    };
 
     @SuppressLint("HandlerLeak")
     private Handler autoConnectHandler = new Handler() {
@@ -324,11 +358,11 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                 if (Constants.READ_1 == typeBean.getType()) {
                                     if (isOpenOrClose) {
                                         if (typeBean.getLockType() == Constants.Lock0) {
-                                            tipDialog.setClick(true);
+                                            tipDialog.setClick(false);
                                         }
                                     } else {
                                         if (typeBean.getLockType() == Constants.Lock3) {
-                                            tipDialog.setClick(true);
+                                            tipDialog.setClick(false);
                                         }
                                     }
                                     if (!tipDialog.isShowing()) {
@@ -352,21 +386,46 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                         builder.create().show();
                                     }
                                 } else if (Constants.READ_5 == typeBean.getType()) {
-                                    if (!typeBean.isOk() && write05Index < (write05.size() - 1)) {
-                                        write05Index++;
-                                        BleManager.getInstance().write(mBleDevice,
-                                                Constants.UUID_SERVICE,
-                                                Constants.UUID_WRITE_CHA,
-                                                BleUtils.newInstance().write05(write05Index, write05),
-                                                new BleWriteCallback() {
-                                                    @Override
-                                                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
-                                                    }
+                                    if (isSend05) {
+                                        if (!typeBean.isOk() && write05Index < (write05.size() - 1)) {
+                                            write05Index++;
+                                            BleManager.getInstance().write(mBleDevice,
+                                                    Constants.UUID_SERVICE,
+                                                    Constants.UUID_WRITE_CHA,
+                                                    BleUtils.newInstance().write05(write05Index, write05),
+                                                    new BleWriteCallback() {
+                                                        @Override
+                                                        public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                                                        }
 
-                                                    @Override
-                                                    public void onWriteFailure(BleException exception) {
-                                                    }
-                                                });
+                                                        @Override
+                                                        public void onWriteFailure(BleException exception) {
+                                                            isSend05 = false;
+                                                        }
+                                                    });
+                                        } else {
+                                            isSend05 = false;
+                                        }
+                                    } else {
+                                        if (!typeBean.isOk() && needWrite05Index < (needWrite05.size() - 1)) {
+                                            needWrite05Index++;
+                                            BleManager.getInstance().write(mBleDevice,
+                                                    Constants.UUID_SERVICE,
+                                                    Constants.UUID_WRITE_CHA,
+                                                    BleUtils.newInstance().write05(needWrite05Index, needWrite05),
+                                                    new BleWriteCallback() {
+                                                        @Override
+                                                        public void onWriteSuccess(int current, int total, byte[] justWrite) {
+                                                        }
+
+                                                        @Override
+                                                        public void onWriteFailure(BleException exception) {
+                                                            needSend05 = false;
+                                                        }
+                                                    });
+                                        } else {
+                                            needSend05 = false;
+                                        }
                                     }
                                 } else if (Constants.READ_6 == typeBean.getType()) {
                                     write06.add(typeBean.getData());
@@ -423,10 +482,17 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                                         }
                                                     }
                                                     if (read != -1 && !Arrays.equals(data05, Constants.ERROR)) {
-                                                        write05 = DataConvert.needSend05(data05);
-                                                        write05Index = 0;
+                                                        needSend05 = true;
+                                                        needWrite05 = DataConvert.needSend05(data05);
+                                                        needWrite05Index = 0;
 
+                                                        send05Handler.removeMessages(0);
+                                                        send05Handler.sendEmptyMessageDelayed(0, 1000);
+                                                    } else {
+                                                        needSend05 = false;
                                                     }
+                                                } else {
+                                                    needSend05 = false;
                                                 }
                                             } catch (IOException e) {
                                                 e.printStackTrace();
@@ -450,6 +516,12 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private void openOrClose(boolean openOrClose) {
         progressDialog.setMessage(openOrClose ? "开锁中..." : "关锁中...");
         progressDialog.show();
+
+        if (needSend05) {
+            progressDialog.setMessage("正在发送数据，请稍后");
+            progressDialog.show();
+            return;
+        }
 
         mThreadPool.execute(() -> {
             try {
@@ -478,6 +550,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                         }
                     }
                     if (read != -1 && !Arrays.equals(data, Constants.ERROR)) {
+                        isSend05 = true;
                         write05 = DataConvert.needSend05(data);
                         write05Index = 0;
                         BleManager.getInstance().write(mBleDevice,
@@ -491,17 +564,20 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
 
                                     @Override
                                     public void onWriteFailure(BleException exception) {
+                                        isSend05 = false;
                                         tipDialog.dismiss();
                                         lockLy.setVisibility(View.GONE);
                                         Toast.makeText(LockActivity.this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
                                     }
                                 });
                     } else {
+                        isSend05 = false;
                         tipDialog.dismiss();
                         lockLy.setVisibility(View.GONE);
                         Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
                     }
                 } else {
+                    isSend05 = false;
                     tipDialog.dismiss();
                     lockLy.setVisibility(View.GONE);
                     Toast.makeText(this, "验证失败,没有权限", Toast.LENGTH_LONG).show();
@@ -518,14 +594,18 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private void clearData() {
         handler.removeMessages(0);
         autoConnectHandler.removeMessages(0);
+        send05Handler.removeMessages(0);
 
         write05 = new ArrayList<>();
         write05Index = 0;
+        isSend05 = false;
 
-        write06 = new ArrayList<>();
+        needWrite05 = new ArrayList<>();
+        needWrite05Index = 0;
+        needSend05 = false;
 
         if (tipDialog != null) {
-            tipDialog.setClick(false);
+            tipDialog.setClick(true);
         }
     }
 }
