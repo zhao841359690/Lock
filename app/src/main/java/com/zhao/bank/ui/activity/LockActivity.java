@@ -539,6 +539,7 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                             builder.create().show();
                                         }
                                     } else {
+                                        progressDialog.dismiss();
                                         AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
                                                 .setMessage("连接异常,锁无法通过手机与后台通讯").setPositiveButton("确定", (dialog, which) -> {
                                                     dialog.dismiss();
