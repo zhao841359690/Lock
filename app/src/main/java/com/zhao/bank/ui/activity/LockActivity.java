@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothGatt;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -195,9 +196,23 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 BleManager.getInstance().disconnect(mBleDevice);
             }
         });
+        tipDialog.setOnKeyListener((dialog, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                progressDialog.dismiss();
+                tipDialog.dismiss();
+            }
+            return false;
+        });
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setCanceledOnTouchOutside(false);
+        progressDialog.setOnKeyListener((dialog, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK) {
+                progressDialog.dismiss();
+                tipDialog.dismiss();
+            }
+            return false;
+        });
 
         boolean showLock = getIntent().getBooleanExtra("showLock", false);
         if (showLock) {
