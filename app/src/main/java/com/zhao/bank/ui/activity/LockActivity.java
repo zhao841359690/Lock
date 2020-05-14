@@ -510,10 +510,33 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                         });
                                     }
                                 } else if (Constants.READ_7 == typeBean.getType()) {
-                                    progressDialog.dismiss();
-                                    if (isOpenOrCloseClick) {
+                                    if (typeBean.isOk()) {
+                                        BleManager.getInstance().write(mBleDevice,
+                                                Constants.UUID_SERVICE,
+                                                Constants.UUID_WRITE_CHA,
+                                                BleUtils.newInstance().write07(),
+                                                new BleWriteCallback() {
+                                                    @Override
+                                                    public void onWriteSuccess(int current, int total, byte[] justWrite) {
+
+                                                    }
+
+                                                    @Override
+                                                    public void onWriteFailure(BleException exception) {
+                                                    }
+                                                });
+                                        progressDialog.dismiss();
+                                        if (isOpenOrCloseClick) {
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
+                                                    .setMessage(isOpenOrClose ? "开锁操作已完成" : "关锁操作已完成").setPositiveButton("确定", (dialog, which) -> {
+                                                        dialog.dismiss();
+                                                        tipDialog.dismiss();
+                                                    });
+                                            builder.create().show();
+                                        }
+                                    } else {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
-                                                .setMessage(isOpenOrClose ? "开锁操作已完成" : "关锁操作已完成").setPositiveButton("确定", (dialog, which) -> {
+                                                .setMessage("连接异常,锁无法通过手机与后台通讯").setPositiveButton("确定", (dialog, which) -> {
                                                     dialog.dismiss();
                                                     tipDialog.dismiss();
                                                 });

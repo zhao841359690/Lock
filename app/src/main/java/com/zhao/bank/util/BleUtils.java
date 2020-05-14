@@ -127,6 +127,25 @@ public class BleUtils {
         return write06;
     }
 
+    public byte[] write07() {
+        byte[] bytes = new byte[16];
+        bytes[0] = 0x07;
+        chk = chkUpdateDownRandom(chk);
+        for (int i = 0; i < chk.length; i++) {
+            bytes[i + 1] = chk[i];
+        }
+        byte[] encrypt = AESUtils.encrypt(bytes, Constants.KEY);
+        byte[] write07 = new byte[17];
+        for (int i = 0; i <= encrypt.length; i++) {
+            if (i == encrypt.length) {
+                write07[i] = getXor(encrypt);
+            } else {
+                write07[i] = encrypt[i];
+            }
+        }
+        return write07;
+    }
+
     private byte getXor(byte[] bytes) {
         byte temp = bytes[0];
         for (int i = 1; i < bytes.length; i++) {
@@ -212,6 +231,11 @@ public class BleUtils {
                 }
             } else if (typeByte == 0x07) {
                 typeBean.setType(Constants.READ_7);
+                if (dataBytes[0] == 0x00) {
+                    typeBean.setOk(true);
+                } else if (dataBytes[0] == 0x0F) {
+                    typeBean.setOk(false);
+                }
             }
             return typeBean;
         }
