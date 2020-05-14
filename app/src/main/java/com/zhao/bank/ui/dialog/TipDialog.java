@@ -37,7 +37,15 @@ public class TipDialog extends Dialog implements View.OnClickListener {
 
     public void setClick(boolean click) {
         this.click = click;
-
+        if (openCloseTv != null) {
+            if (click) {
+                openCloseTv.setBackgroundResource(R.drawable.shape_gradation_blue);
+                openCloseTv.setOnClickListener(this);
+            } else {
+                openCloseTv.setBackgroundResource(R.drawable.shape_gray);
+                openCloseTv.setOnClickListener(null);
+            }
+        }
     }
 
     @Override
