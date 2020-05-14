@@ -7,7 +7,6 @@ import android.bluetooth.BluetoothGatt;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Html;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -373,17 +372,11 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                     }
                                 } else if (Constants.READ_4 == typeBean.getType()) {
                                     if (typeBean.getLockType() == Constants.Lock0) {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
-                                                .setMessage("开锁成功").setPositiveButton("确定",
-                                                        (dialogInterface, i) -> dialogInterface.dismiss());
-                                        builder.create().show();
+                                        progressDialog.setMessage("开锁成功");
                                     } else if (typeBean.getLockType() == Constants.Lock2) {
                                         progressDialog.setMessage("请把锁钩压回");
                                     } else if (typeBean.getLockType() == Constants.Lock3) {
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
-                                                .setMessage("关锁成功").setPositiveButton("确定",
-                                                        (dialogInterface, i) -> dialogInterface.dismiss());
-                                        builder.create().show();
+                                        progressDialog.setMessage("关锁成功");
                                     }
                                 } else if (Constants.READ_5 == typeBean.getType()) {
                                     if (isSend05) {
@@ -501,6 +494,12 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                     }
                                 } else if (Constants.READ_7 == typeBean.getType()) {
                                     progressDialog.dismiss();
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
+                                            .setMessage(isOpenOrClose ? "开锁操作已完成" : "关锁操作已完成").setPositiveButton("确定", (dialog, which) -> {
+                                                dialog.dismiss();
+                                                tipDialog.dismiss();
+                                            });
+                                    builder.create().show();
                                 }
                             } else {
                                 BleManager.getInstance().stopNotify(mBleDevice, Constants.UUID_SERVICE, Constants.UUID_NOTIFY);
