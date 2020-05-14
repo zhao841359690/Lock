@@ -78,6 +78,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
     private ProgressDialog progressDialog;
     private boolean isOpenOrClose = false;
 
+    private boolean isOpenOrCloseClick = false;
+
     private BleDevice mBleDevice;
     private String address;
     private String uid;
@@ -494,12 +496,14 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                                     }
                                 } else if (Constants.READ_7 == typeBean.getType()) {
                                     progressDialog.dismiss();
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
-                                            .setMessage(isOpenOrClose ? "开锁操作已完成" : "关锁操作已完成").setPositiveButton("确定", (dialog, which) -> {
-                                                dialog.dismiss();
-                                                tipDialog.dismiss();
-                                            });
-                                    builder.create().show();
+                                    if (isOpenOrCloseClick) {
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(LockActivity.this)
+                                                .setMessage(isOpenOrClose ? "开锁操作已完成" : "关锁操作已完成").setPositiveButton("确定", (dialog, which) -> {
+                                                    dialog.dismiss();
+                                                    tipDialog.dismiss();
+                                                });
+                                        builder.create().show();
+                                    }
                                 }
                             } else {
                                 BleManager.getInstance().stopNotify(mBleDevice, Constants.UUID_SERVICE, Constants.UUID_NOTIFY);
@@ -529,6 +533,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
                 }
 
                 outputStream = socket.getOutputStream();
+
+                isOpenOrCloseClick = true;
 
                 outputStream.write(SocketUtils.writeLock(uid, openOrClose));
                 outputStream.flush();
@@ -602,6 +608,8 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
         needWrite05 = new ArrayList<>();
         needWrite05Index = 0;
         needSend05 = false;
+
+        isOpenOrCloseClick = false;
 
         if (tipDialog != null) {
             tipDialog.setClick(true);
