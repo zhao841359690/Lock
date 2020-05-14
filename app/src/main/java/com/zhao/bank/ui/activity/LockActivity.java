@@ -213,6 +213,10 @@ public class LockActivity extends BaseActivity implements TipDialog.OnTipDialogC
             }
             return false;
         });
+        progressDialog.setOnCancelListener(dialog -> {
+            progressDialog.dismiss();
+            tipDialog.dismiss();
+        });
 
         boolean showLock = getIntent().getBooleanExtra("showLock", false);
         if (showLock) {
